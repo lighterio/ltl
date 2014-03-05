@@ -160,6 +160,7 @@ exports.compile = function (code, name, options) {
 			}
 		}
 	}
+
 	closeLevels(level);
 	appendText('script', "return o}");
 	output = output.replace(/#\{([^\}]+)\}/g, function (match, code) {
