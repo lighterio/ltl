@@ -1,6 +1,6 @@
 var jade = require('jade');
 var dot = require('dot');
-var ltl = require('ltl');
+var ltl = require('../index');
 
 var code =
 	'html\n' +
