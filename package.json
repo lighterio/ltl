@@ -1,0 +1,31 @@
+{
+  "name": "ltl",
+  "description": "Lightweight Template Language for JavaScript and HTML",
+  "keywords": [
+    "lightweight",
+    "fast",
+    "simple",
+    "template",
+    "engine",
+    "jade",
+    "dot"
+  ],
+  "version": "0.0.1",
+  "main": "index",
+  "homepage": "http://github.com/zerious/ltl",
+  "repository": "git://github.com/zerious/ltl.git",
+  "author": "Sam Eubank <sameubank@gmail.com>",
+  "engines": [
+    "node >= 0.2.6"
+  ],
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "jade": "*",
+    "dot": "*",
+    "mocha":"*"
+  }
+}
