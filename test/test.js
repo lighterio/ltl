@@ -8,5 +8,9 @@ describe('ltl', function(){
 		it('should be a function', function() {
 			ltl.compile.should.be.a.Function;
 		})
+		it('should return a function', function() {
+			var template = "";
+			ltl.compile("").should.be.a.Function;
+		})
 	})
 })

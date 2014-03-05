@@ -98,6 +98,8 @@ exports.compile = function (code, name, options) {
 		// If this is our first time seeing leading spaces, it's a single indent.
 		if (spaces > 0 && !tabWidth) {
 			tabWidth = spaces;
+		} else if (spaces == -1) {
+			spaces = 0;
 		}
 
 		var indent = spaces ? Math.round(spaces / tabWidth) : 0;
@@ -105,9 +107,9 @@ exports.compile = function (code, name, options) {
 		closeLevels(1 - change);
 		level = indent;
 
+
 		// Strip the leading spaces.
 		line = line.substr(spaces);
-
 		// Don't do anything with an empty line.
 		if (!line) {
 			continue;
