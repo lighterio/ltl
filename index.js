@@ -2,12 +2,17 @@
  * ltl is a template engine designed to be simple, beautiful and fast.
  */
 
-// Allow leniency with tabs and spaces.
-module.exports = (function() {
+var ltl = module.exports = (function() {
+
+	// Allow leniency with tabs and spaces.
 	var defaultTabWidth = 4;
+
+	// Some HTML tags won't have end tags;
 	var selfClosePattern = /^(br|hr|img|input)$/;
+
 	// Supported JavaScript keywords.
 	var jsPattern = /^(for|each|if|else|else if)$/;
+
 	// Utility for throwing an exception.
 	var throwError = function(msg, line) {
 		throw new Error(msg + "\n" + line, 'ltl');
@@ -15,6 +20,7 @@ module.exports = (function() {
 
 	return {
 		compile: function(code, name, options) {
+
 			// Replace carriage returns for Windows compatibility.
 			code = code.replace(/\r/g, '');
 
@@ -58,13 +64,25 @@ module.exports = (function() {
 			}
 
 			function transformScript(script) {
-				script = script.replace(/^(for|each) ([$a-zA-Z_0-9]+) in ([$a-zA-Z_0-9]+)/i,
+				script = script.replace(/^(for|each)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s+in\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
 					function(match, keyword, item, array) {
 						var i = vars[varIndex++];
 						var l = vars[varIndex++];
 						return 'for(var ' + i + '=0,' + l + '=c.' + array + '.length;' +
 							i + '<' + l + ';++' + i + ')' +
 							'{c.' + item + '=c.' + array + '[' + i + ']' + ';'
+					});
+				script = script.replace(/^(for|each)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*,\s*([$a-zA-Z_][$a-zA-Z_0-9]*)\s+of\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
+					function(match, keyword, key, value, object) {
+						var i = vars[varIndex++];
+						return 'for(var ' + i + ' in c.' + object + ')' +
+							'{if(!c.' + object + '.hasOwnProperty(' + i + '))continue;' +
+							'c.' + key + '=' + i + ';'
+							'c.' + value + '=c.' + object + '[' + i + ']' + ';'
+					});
+				script = script.replace(/^(if|else|else if)\s+(\S.*)$/i,
+					function(match, keyword, condition) {
+						return keyword + '(' + condition + '){'
 					});
 				return script;
 			}
