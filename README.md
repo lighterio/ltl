@@ -9,7 +9,7 @@ is amazing like [dot](https://github.com/olado/doT).
 *Performance testing* can be done by running `node perf`.
 The output shows the average time in milliseconds it took to perform each of the operations.
 
-*Unit testing* can be done by running `mocha`.
+*Unit testing* can be done by running `npm test`.
 
 ### Contributing
 
