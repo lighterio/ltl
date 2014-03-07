@@ -174,7 +174,7 @@ var ltl = module.exports = (function() {
 				}
 			}
 
-			closeLevels(level);
+			closeLevels(level + 1);
 			appendText('script', "return o}");
 			output = output.replace(/#\{([^\}]+)\}/g, function(match, code) {
 				return "'+" + interpolate(code) + "+'";
