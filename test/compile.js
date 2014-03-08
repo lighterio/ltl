@@ -1,4 +1,4 @@
-var ltl = require('../index');
+var ltl = require('../lib/ltl');
 
 describe('ltl', function(){
 	it('should be an object', function() {
@@ -11,10 +11,7 @@ describe('ltl', function(){
 	});
 	describe('.compile("")', function(){
 		it('should return a function', function() {
-			// Input
-			var template = "";
-
-			ltl.compile(template).should.be.a.Function;
+			ltl.compile('').should.be.a.Function;
 		});
 	});
 });

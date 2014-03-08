@@ -1,4 +1,4 @@
-var ltl = require('../index');
+var ltl = require('../lib/ltl');
 var assert = require('assert');
 
 describe('Nesting', function () {
