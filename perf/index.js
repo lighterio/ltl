@@ -4,13 +4,13 @@ var ltl = require('../index');
 
 var code =
 	'html\n' +
-	'    head\n' +
-	'        title Hello World\n' +
-	'    body\n' +
-	'        div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
-	'        ul\n' +
-	'            each item in items\n' +
-	'                li #{item}\n';
+	' head\n' +
+	'  title Hello World\n' +
+	' body\n' +
+	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
+	'  ul\n' +
+	'   each item in items\n' +
+	'    li #{item}\n';
 
 var dotCode = '<html><head><title>Hello World</title></head>' +
 	'<body><div id="hey" class="a b" style="display:block;width:100px">' +
