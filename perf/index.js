@@ -2,7 +2,17 @@ var jade = require('jade');
 var dot = require('dot');
 var ltl = require('../index');
 
-var code =
+var ltlCode =
+	'html\n' +
+	' head\n' +
+	'  title Hello World\n' +
+	' body\n' +
+	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
+	'  ul\n' +
+	'   for item in items\n' +
+	'    li #{item}\n';
+
+var jadeCode =
 	'html\n' +
 	' head\n' +
 	'  title Hello World\n' +
@@ -25,7 +35,7 @@ console.log('doT:');
 console.log(dot.compile(dotCode).toString());
 console.log('');
 console.log('ltl:');
-console.log(ltl.compile(code).toString());
+console.log(ltl.compile(ltlCode).toString());
 console.log('');
 
 var i, started, elapsed, result;
@@ -35,9 +45,9 @@ var compileCount = 1e2;
 var renderCount = 1e5;
 
 var engines = [
-	{name: 'Jade', code: code, lib: jade},
+	{name: 'Jade', code: jadeCode, lib: jade},
 	{name: 'doT', code: dotCode, lib: dot},
-	{name: 'ltl', code: code, lib: ltl}
+	{name: 'ltl', code: ltlCode, lib: ltl}
 ];
 
 var operations = [
