@@ -19,7 +19,10 @@
     "node >= 0.2.6"
   ],
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha",
+    "test-watch": "./node_modules/mocha/bin/mocha --watch",
+    "mocha": "./node_modules/mocha/bin/mocha",
+    "view-coverage": "open coverage/lcov-report/index.html"
   },
   "dependencies": {},
   "devDependencies": {
@@ -27,6 +30,7 @@
     "assert-plus": "~0.1.5",
     "dot": "~1.0.2",
     "mocha": "~1.17.1",
-    "should": "~3.1.3"
+    "should": "~3.1.3",
+    "istanbul": "~0.2.6"
   }
 }

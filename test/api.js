@@ -11,7 +11,7 @@ describe('API', function(){
 			ltl.compile.should.be.a.Function;
 		});
 	});
-	describe('ltl.compile("")', function(){
+	describe('ltl.compile(string)', function(){
 		it('should return a function', function() {
 			ltl.compile('').should.be.a.Function;
 		});
