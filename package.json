@@ -22,7 +22,8 @@
     "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha",
     "test-watch": "./node_modules/mocha/bin/mocha --watch",
     "mocha": "./node_modules/mocha/bin/mocha",
-    "view-coverage": "open coverage/lcov-report/index.html"
+    "view-coverage": "open coverage/lcov-report/index.html",
+    "perf": "node perf"
   },
   "dependencies": {},
   "devDependencies": {
