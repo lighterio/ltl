@@ -7,14 +7,9 @@ describe('API', function () {
 			ltl.should.be.an.Object;
 		});
 	});
-	describe('ltl.compile', function () {
-		it('should be a function', function () {
-			ltl.compile.should.be.a.Function;
-		});
-	});
-	describe('ltl.compile(string)', function () {
-		it('should return a function', function () {
-			ltl.compile('').should.be.a.Function;
+	describe('ltl.version', function () {
+		it('should expose version', function () {
+			assert(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
 		});
 	});
 	describe('ltl.setTabWidth(int)', function () {
@@ -46,6 +41,16 @@ describe('API', function () {
 			ltl.setContextVar('c');
 			var code = ltl.compile('p').toString();
 			assert.equal(code, "function (c){var o='<p></p>';return o}");
+		});
+	});
+	describe('ltl.compile', function () {
+		it('should be a function', function () {
+			ltl.compile.should.be.a.Function;
+		});
+	});
+	describe('ltl.compile(string)', function () {
+		it('should return a function', function () {
+			ltl.compile('').should.be.a.Function;
 		});
 	});
 });
