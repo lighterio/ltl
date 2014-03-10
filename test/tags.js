@@ -35,6 +35,12 @@ describe('Tags', function () {
 			var result = ltl.compile('()')();
 			assert.equal(result, '<div></div>');
 		});
+		it('should turn ! or doctype into !doctype and assume html', function () {
+            var result = ltl.compile('!\nhtml\n head\n  title Title\n body Body')();
+            assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
+            var result = ltl.compile('!(test)\nhtml\n head\n  title Title\n body Body')();
+            assert.equal(result, '<!DOCTYPE test><html><head><title>Title</title></head><body>Body</body></html>');
+		});
 	});
 	describe('IDs and classes', function () {
 		it('should work with a tag and ID', function () {
