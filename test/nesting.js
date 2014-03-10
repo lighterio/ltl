@@ -40,4 +40,28 @@ describe('Nesting', function () {
 			assert.equal(result, '<b><i></i></b><b><i></i></b>');
 		});
 	});
+	describe('Inline', function () {
+		it('should work with spaces and tabs', function () {
+			var result;
+			result = ltl.compile('p:b test')();
+			assert.equal(result, '<p><b>test</b></p>');
+			result = ltl.compile('p: b test')();
+			assert.equal(result, '<p><b>test</b></p>');
+			result = ltl.compile('p:  b test')();
+			assert.equal(result, '<p><b>test</b></p>');
+			result = ltl.compile('p:\tb test')();
+			assert.equal(result, '<p><b>test</b></p>');
+		});
+		it('should nest to multiple levels', function () {
+			var result;
+			result = ltl.compile('p:b:i')();
+			assert.equal(result, '<p><b><i></i></b></p>');
+		});
+		it('should not interfere with other nesting', function () {
+			var result;
+			result = ltl.compile('.\n p:b\n br\n p:b')();
+			assert.equal(result, '<div><p><b></b></p><br><p><b></b></p></div>');
+		});
+	});
 });
+	
