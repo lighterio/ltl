@@ -2,11 +2,11 @@ var ltl = require('../lib/ltl');
 var assert = require('assert-plus');
 
 describe('Includes', function () {
-	it('should have a templates object', function () {
-		assert.object(ltl.templates);
+	it('should have a cache object', function () {
+		assert.object(ltl.cache);
 	});
-	it('should put templates at paths', function () {
+	it('should put templates in the cache', function () {
 		ltl.compile('b #{text}', {path: 'bold'});
-		assert.func(ltl.templates.bold);
+		assert.func(ltl.cache.bold);
 	});
 });
