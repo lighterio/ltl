@@ -10,6 +10,8 @@ describe('API', function () {
 	describe('ltl.version', function () {
 		it('should expose version', function () {
 			assert(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
+			var pkg = require('../package.json');
+			assert.equal(pkg.version, ltl.version);
 		});
 	});
 	describe('ltl.setTabWidth(int)', function () {
