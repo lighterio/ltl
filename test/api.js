@@ -45,6 +45,12 @@ describe('API', function () {
 			assert.equal(code, "function (c){var o='<p></p>';return o}");
 		});
 	});
+	describe('ltl.setPartsVar(string)', function () {
+		it('should modify parts variable', function () {
+			ltl.setPartsVar('parts');
+			ltl.setPartsVar('p');
+		});
+	});
 	describe('ltl.compile', function () {
 		it('should be a function', function () {
 			assert.func(ltl.compile);
