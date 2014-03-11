@@ -1,15 +1,15 @@
 var ltl = require('../lib/ltl');
-var assert = require('assert');
+var assert = require('assert-plus');
 
 describe('API', function () {
 	describe('ltl', function () {
 		it('should be an object', function () {
-			ltl.should.be.an.Object;
+			assert.object(ltl);
 		});
 	});
 	describe('ltl.version', function () {
 		it('should expose version', function () {
-			assert(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
+			assert.ok(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
 			var pkg = require('../package.json');
 			assert.equal(pkg.version, ltl.version);
 		});
@@ -47,12 +47,12 @@ describe('API', function () {
 	});
 	describe('ltl.compile', function () {
 		it('should be a function', function () {
-			ltl.compile.should.be.a.Function;
+			assert.func(ltl.compile);
 		});
 	});
 	describe('ltl.compile(string)', function () {
 		it('should return a function', function () {
-			ltl.compile('').should.be.a.Function;
+			assert.func(ltl.compile(''));
 		});
 	});
 });
