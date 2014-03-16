@@ -1,5 +1,9 @@
 # ltl
 
+ [![Build Status](https://travis-ci.org/zerious/ltl.png?branch=master)](https://travis-ci.org/zerious/ltl)
+ [![Dependency Status](https://gemnasium.com/zerious/ltl.png)](https://gemnasium.com/zerious/ltl)
+ [![NPM version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
+
 The ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
 HTML at [doT](https://github.com/olado/doT)-like speeds.
@@ -125,8 +129,8 @@ You can output blocks of content using `:`.
 Blocks can be passed through filters, such as markdown.
 ```jade
 :markdown
-  # ltl
-  It's a recursive acronym for "ltl template language".
+    # ltl
+    It's a recursive acronym for "ltl template language".
 ```
 ```html
 <h1>ltl</h1><p>It's a recursive acronym for "ltl template language".</p>
