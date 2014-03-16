@@ -15,6 +15,13 @@ describe('Blocks', function () {
 		var hasHeading = /<h1>Heading<\/h1>/.test(result);
 		assert(hasHeading);
 	});
+	it('should work without a tag', function () {
+		var result = ltl.compile(':markdown\n Heading\n =====')();
+		var hasHeading = /<h1>Heading<\/h1>/.test(result);
+		assert(hasHeading);
+		var startsWithDiv = /^<div>/.test(result);
+		assert(startsWithDiv);
+	});
 	it('should work with CoffeeScript', function () {
 		var result = ltl.compile('script:coffee-script\n a = 1')();
 		var hasVar = /var/.test(result);

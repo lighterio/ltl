@@ -36,9 +36,9 @@ describe('Tags', function () {
 			assert.equal(result, '<div></div>');
 		});
 		it('should turn ! or doctype into !doctype and assume html', function () {
-			var result = ltl.compile('!\nhtml\n head\n  title Title\n body Body')();
+			var result = ltl.compile('html\n head\n  title Title\n body Body')();
 			assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
-			var result = ltl.compile('!(test)\nhtml\n head\n  title Title\n body Body')();
+			var result = ltl.compile('!DOCTYPE(test)\nhtml\n head\n  title Title\n body Body')();
 			assert.equal(result, '<!DOCTYPE test><html><head><title>Title</title></head><body>Body</body></html>');
 		});
 	});
