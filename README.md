@@ -1,4 +1,4 @@
-# ltl
+# ltl [https://badge.fury.io/js/ltl.png] [https://travis-ci.org/zerious/ltl.png?branch=master] [https://david-dm.org/zerious/ltl.png]
 
 The ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
