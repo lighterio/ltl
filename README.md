@@ -1,8 +1,8 @@
 # ltl
 
 The ltl template language (pronounced "little") uses a clean
-[Jade](http://jade-lang.com/reference/)-like syntax to make JavaScript
-generate HTML at [doT](https://github.com/olado/doT)-like speeds.
+[Jade](http://jade-lang.com/reference/)-like syntax to generate
+HTML at [doT](https://github.com/olado/doT)-like speeds.
 
 If you love tight code and fast rendering, you're right at home.
 
@@ -47,9 +47,9 @@ var result = template({name: 'World'});
 ## Language
 
 ### Nesting
-Tag nesting is done with whitespace.
+Tag nesting is done with whitespace. You can use tabs or spaces,
+and ltl can detect the number of spaces you're using.
 ```jade
-!
 html
   head
     title Hello World!
@@ -67,7 +67,7 @@ html
   </body>
 </html>
 ```
-Note: `!` is shorthand for `<!DOCTYPE html>`.
+Note: `<!DOCTYPE html>` is automagically inserted before an `<html>` tag.
 
 Nesting can also be done with one-liners using `>`.
 ```jade
@@ -107,21 +107,46 @@ they would be inside an HTML tag.
 ```
 Note: Unlike Jade, ltl does not use commas between attributes.
 
+### Blocks
+
+You can output blocks of content using `:`.
+```jade
+#blah:
+  Bob Loblaw's Law Blog asks, "Why should YOU go
+  to jail for a crime someone else noticed?
+```
+```html
+<div id="blah">
+  Bob Loblaw's Law Blog asks "Why should YOU go
+  to jail for a crime someone else noticed?
+</div>
+```
+
+Blocks can be passed through filters, such as markdown.
+```jade
+:markdown
+    # ltl
+    It's a recursive acronym for "ltl template language".
+```
+```html
+<h1>ltl</h1><p>It's a recursive acronym for "ltl template language".</p>
+```
 
 ### Interpolation
+
 You can output the value of a context property with `#{..}`.
-```jade
-var ltl = require('ltl');
+```javascript
 var code = '. Hello #{name}!';
-ltl.compile(code, {name: 'Sam'});
+var template = ltl.compile(code)
+template({name: 'Sam'});
 ```
 ```
 <div>Hello Sam!</div>
 ```
 
 If you'd like your content to skip HTML encoding (because
-you want the HTML tags in your variable to be markup rather
-than text, use `={..}`.
+you want your expression to output HTML tags rather than
+text, use `={..}`.
 
 Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 ```jade
@@ -153,13 +178,54 @@ ul
 <ul><li>IPA</li><li>Porter</li><li>Stout</li></ul>
 ```
 
-Use `if`, `else` or `else if` to show output HTML or not.
-The stuff after your control statement and a space will
-be executed as JavaScript.
+### Conditionals
+
+Use `if`, `else` or `else if` to render conditionally.
+The control statement's inline content gets evaluated
+as JavaScript.
+```jade
+if username == 'root'
+  . Do as you please.
+else if username
+  . Do as you can.
+else
+  . Don't.
+```
+
+You can use builtin objects and whatnot.
 ```jade
 if Math.random() > 0.5
     p This has a 50/50 chance of showing.
 ```
+
+
+### Using templates within templates
+
+A template can use another template with `use`. To accomplish
+this, you must compile your templates with `options.name`, and
+they will be stored in ltl.cache. The
+template that's being `use`d can access the data context.
+```jade
+var temp = ltl.compile('p\n use bold', {name: 'temp'});
+var bold = ltl.compile('b #{text}', {name: 'bold'});
+ltl.cache.temp({text: 'Hi!'});
+```
+```
+<p><b>Hi!</b></p>
+```
+
+With `get`, a template can get content from a template that
+has used it with `use`.  Content that is passed into `get` blocks
+is declared with `set`.
+```jade
+var layout = ltl.compile('#nav\n get nav\n#content\n get content', {name: 'layout'});
+var page = ltl.compile('use layout\n set nav\n  . Nav\n set content\n  . Content', {name: 'page'});
+ltl.cache.page();
+```
+```
+<div id="nav">Nav</div><div id="content">Content</div>
+```
+
 
 ## Contributing
 
