@@ -15,6 +15,10 @@
   "homepage": "http://github.com/zerious/ltl",
   "repository": "git://github.com/zerious/ltl.git",
   "author": "Sam Eubank <sameubank@gmail.com>",
+  "contributors": [
+    "Sam Eubank <sameubank@gmail.com>",
+    "Kaushik Shankar <skaushik92@gmail.com>"
+  ],
   "engines": [
     "node >= 0.2.6"
   ],
