@@ -23,14 +23,14 @@
     "node >= 0.2.6"
   ],
   "scripts": {
-    "test": "./node_modules/istanbul/lib/cli.js test ./node_modules/mocha/bin/_mocha",
-    "test-watch": "./node_modules/mocha/bin/mocha --watch",
-    "mocha": "./node_modules/mocha/bin/mocha",
-    "view-coverage": "open coverage/lcov-report/index.html",
+    "test": "mocha",
+    "retest": "mocha --watch",
+    "cover": "istanbul cover _mocha",
+    "report": "open coverage/lcov-report/index.html",
+    "coveralls": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
     "perf": "node perf"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "assert-plus": "~0.1.5",
     "dot": "~1.0.2",
@@ -39,6 +39,7 @@
     "istanbul": "~0.2.6",
     "jade": "~1.3.0",
     "markdown": "^0.5.0",
-    "coffee-script": "^1.7.1"
+    "coffee-script": "^1.7.1",
+    "coveralls": "^2.10.0"
   }
 }
