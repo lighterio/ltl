@@ -136,6 +136,22 @@ Blocks can be passed through filters, such as markdown.
 <h1>ltl</h1><p>It's a recursive acronym for "ltl template language".</p>
 ```
 
+### Comments
+
+Line comments and block comments are inserted by using `//` as a tag (at
+the beginning of a line). Both are ignored.
+```jade
+h1 Comments
+// No one will see this.
+p Hello from http://lighter.io/ltl
+//
+  This won't be shown.
+  Neither will this.
+```
+```html
+<h1>Comments</h1><p>Hello from http://lighter.io/ltl</p>
+```
+
 ### Interpolation
 
 You can output the value of a context property with `#{..}`.
