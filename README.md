@@ -46,7 +46,7 @@ var result = template({name: 'World'});
 
 ### ltl.setPartsVar(name)
  * `name` is the name of the argument that an ltl template receives
-   from a template that uses it as an abstract template.
+   from a template that calls it as an abstract template.
    (Default: `p`)
 
 ## Language
@@ -213,7 +213,7 @@ else
   . Don't.
 ```
 
-You can use builtin objects and whatnot.
+You can use builtin JavaScript objects and whatnot.
 ```jade
 if Math.random() > 0.5
     p This has a 50/50 chance of showing.
@@ -222,12 +222,12 @@ if Math.random() > 0.5
 
 ### Using templates within templates
 
-A template can use another template with `use`. To accomplish
+A template can call another template with `call`. To accomplish
 this, you must compile your templates with `options.name`, and
-they will be stored in ltl.cache. The
-template that's being `use`d can access the data context.
+they will be stored in `ltl.cache`. The template that's being
+called can access the data context.
 ```jade
-var temp = ltl.compile('p\n use bold', {name: 'temp'});
+var temp = ltl.compile('p\n call bold', {name: 'temp'});
 var bold = ltl.compile('b #{text}', {name: 'bold'});
 ltl.cache.temp({text: 'Hi!'});
 ```
@@ -235,12 +235,13 @@ ltl.cache.temp({text: 'Hi!'});
 <p><b>Hi!</b></p>
 ```
 
-With `get`, a template can get content from a template that
-has used it with `use`.  Content that is passed into `get` blocks
-is declared with `set`.
+With `set` and `get`, a template can get content from a
+template that calls it. The calling template declares what
+it will pass using `set` blocks, and the called template
+reads data with `get` blocks.
 ```jade
 var layout = ltl.compile('#nav\n get nav\n#content\n get content', {name: 'layout'});
-var page = ltl.compile('use layout\n set nav\n  . Nav\n set content\n  . Content', {name: 'page'});
+var page = ltl.compile('call layout\n set nav\n  . Nav\n set content\n  . Content', {name: 'page'});
 ltl.cache.page();
 ```
 ```
@@ -250,29 +251,29 @@ ltl.cache.page();
 
 ## Contributing
 
-Clone the repository
+Clone the repository.
 ```bash
 $ git clone https://github.com/zerious/ltl.git
 ```
 
-Install dependencies
+Install dependencies.
 ```bash
 $ npm install
 ```
 
 ### Testing
 
-Run all tests
+Run all tests.
 ```bash
-$ mocha
+$ npm test
 ```
 
-Watch for changes
+Run tests an rerun them after changes are made.
 ```bash
-$ mocha -w
+$ npm run retest
 ```
 
-Run individual tests
+Run individual test files.
 ```bash
 $ mocha test/api
 $ mocha test/blocks
@@ -281,14 +282,14 @@ $ mocha test/interpolation
 ...
 ```
 
-Test coverage (100% required)
+Test coverage (100% required).
 ```bash
-$ npm test --coverage
+$ npm run cover
 ```
 
-View coverage report
+View coverage report in a browser (uses Mac OS-friendly `open`).
 ```bash
-$ npm run view-coverage
+$ npm run report
 ```
 
 ### Write something awesome and submit a pull request!

@@ -1,16 +1,16 @@
 var jade = require('jade');
 var dot = require('dot');
-var ltl = require('../index');
+var ltl = require('../lib/ltl');
 
 var ltlCode =
 	'html\n' +
 	' head\n' +
 	'  title Hello World\n' +
 	' body\n' +
-	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
+	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: ={message}\n' +
 	'  ul\n' +
 	'   for item in items\n' +
-	'    li #{item}\n';
+	'    li ={item}\n';
 
 var jadeCode =
 	'html\n' +
@@ -39,10 +39,6 @@ console.log(ltl.compile(ltlCode).toString());
 console.log('');
 
 var i, started, elapsed, result;
-var ltlTemplate, jadeTemplate, dotTemplate;
-
-var compileCount = 1e2;
-var renderCount = 1e5;
 
 var engines = [
 	{name: 'Jade', code: jadeCode, lib: jade},

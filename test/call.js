@@ -10,14 +10,20 @@ describe('Includes', function () {
 		assert.func(ltl.cache.bold);
 	});
 	it('should include templates', function () {
-		var temp = ltl.compile('p\n use common', {name: 'temp'});
+		var temp = ltl.compile('p\n call common', {name: 'temp'});
 		ltl.compile('b #{text}', {name: 'common'});
 		var result = ltl.cache.temp({text: 'Hi!'});
 		assert.equal(result, '<p><b>Hi!</b></p>');
 	});
 	it('should include templates', function () {
-		var temp = ltl.compile('use base\n set a\n  p A\n set b\n  p B', {name: 'temp'});
+		var temp = ltl.compile('call base\n set a\n  p A\n set b\n  p B', {name: 'temp'});
 		var base = ltl.compile('div\n get a\n get b', {name: 'base'});
+		var result = ltl.cache.temp();
+		assert.equal(result, '<div><p>A</p><p>B</p></div>');
+	});
+	it('should include block content', function () {
+		var temp = ltl.compile('call base\n set a:\n  A\n set b:\n  B', {name: 'temp'});
+		var base = ltl.compile('div\n p\n  get a\n p\n  get b', {name: 'base'});
 		var result = ltl.cache.temp();
 		assert.equal(result, '<div><p>A</p><p>B</p></div>');
 	});
