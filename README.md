@@ -118,12 +118,12 @@ You can output blocks of content using `:`.
 ```jade
 #blah:
   Bob Loblaw's Law Blog asks, "Why should YOU go
-  to jail for a crime someone else noticed?
+  to jail for a crime someone else noticed?"
 ```
 ```html
 <div id="blah">
-  Bob Loblaw's Law Blog asks "Why should YOU go
-  to jail for a crime someone else noticed?
+  Bob Loblaw's Law Blog asks, "Why should YOU go
+  to jail for a crime someone else noticed?"
 </div>
 ```
 

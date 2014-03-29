@@ -27,10 +27,4 @@ describe('Call', function () {
 		var result = ltl.cache.temp();
 		assert.equal(result, '<div><p>A</p><p>B</p></div>');
 	});
-	it('should include block content', function () {
-		ltl.compile('call page\n set title:\n  Hello\n set content:\n  Welcome to ltl.', {name: 'index'});
-		ltl.compile('html\n head>title\n  get title\n body\n  get content', {name: 'page'});
-		var result = ltl.cache.index();
-		assert.equal(result, '<!DOCTYPE html><html><head><title>Hello</title></head><body>Welcome to ltl.</body></html>');
-	});
 });
