@@ -1,7 +1,7 @@
 var ltl = require('../lib/ltl');
 var assert = require('assert-plus');
 
-describe('Includes', function () {
+describe('Call', function () {
 	it('should have a cache object', function () {
 		assert.object(ltl.cache);
 	});
@@ -9,22 +9,28 @@ describe('Includes', function () {
 		ltl.compile('b #{text}', {name: 'bold'});
 		assert.func(ltl.cache.bold);
 	});
-	it('should include templates', function () {
-		var temp = ltl.compile('p\n call common', {name: 'temp'});
+	it('should call a template from the middle of another template', function () {
+		ltl.compile('p\n call common', {name: 'temp'});
 		ltl.compile('b #{text}', {name: 'common'});
 		var result = ltl.cache.temp({text: 'Hi!'});
 		assert.equal(result, '<p><b>Hi!</b></p>');
 	});
-	it('should include templates', function () {
-		var temp = ltl.compile('call base\n set a\n  p A\n set b\n  p B', {name: 'temp'});
-		var base = ltl.compile('div\n get a\n get b', {name: 'base'});
+	it('should extend a template', function () {
+		ltl.compile('call base\n set a\n  p A\n set b\n  p B', {name: 'temp'});
+		ltl.compile('div\n get a\n get b', {name: 'base'});
 		var result = ltl.cache.temp();
 		assert.equal(result, '<div><p>A</p><p>B</p></div>');
 	});
 	it('should include block content', function () {
-		var temp = ltl.compile('call base\n set a:\n  A\n set b:\n  B', {name: 'temp'});
-		var base = ltl.compile('div\n p\n  get a\n p\n  get b', {name: 'base'});
+		ltl.compile('call base\n set a:\n  A\n set b:\n  B', {name: 'temp'});
+		ltl.compile('div\n p\n  get a\n p\n  get b', {name: 'base'});
 		var result = ltl.cache.temp();
 		assert.equal(result, '<div><p>A</p><p>B</p></div>');
+	});
+	it('should include block content', function () {
+		ltl.compile('call page\n set title:\n  Hello\n set content:\n  Welcome to ltl.', {name: 'index'});
+		ltl.compile('html\n head>title\n  get title\n body\n  get content', {name: 'page'});
+		var result = ltl.cache.index();
+		assert.equal(result, '<!DOCTYPE html><html><head><title>Hello</title></head><body>Welcome to ltl.</body></html>');
 	});
 });
