@@ -3,7 +3,7 @@
  [![NPM version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
  [![Build Status](https://travis-ci.org/zerious/ltl.png?branch=master)](https://travis-ci.org/zerious/ltl)
  [![Coverage Status](https://coveralls.io/repos/zerious/ltl/badge.png?branch=master)](https://coveralls.io/r/zerious/ltl)
- [![Dependency Status](https://david-dm.org/gulpjs/gulp.png?theme=shields.io)](https://david-dm.org/gulpjs/gulp)
+ [![Dependency Status](https://david-dm.org/zerious/ltl.png?theme=shields.io)](https://david-dm.org/zerious/ltl)
 
 The ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
