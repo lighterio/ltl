@@ -27,6 +27,14 @@ describe('Blocks', function () {
 		var hasVar = /var/.test(result);
 		assert(hasVar);
 	});
+	it('should work with text with line breaks', function () {
+		var result = ltl.compile('p:\n First line.\n Second line.')();
+		assert.equal(result, '<p>First line.\nSecond line.</p>');
+	});
+	it('should remove carriage returns', function () {
+		var result = ltl.compile('p:\n\r First line.\r\n Second line.')();
+		assert.equal(result, '<p>First line.\nSecond line.</p>');
+	});
 	it('should work in the browser', function () {
 		global.window = {
 			document: {body: {tagName: 'BODY'}},

@@ -27,4 +27,10 @@ describe('Call', function () {
 		var result = ltl.cache.temp();
 		assert.equal(result, '<div><p>A</p><p>B</p></div>');
 	});
+	it('should escape line breaks in block content', function () {
+		ltl.compile('call page\n set title:\n  ltl\n set content:\n  ltl\n  fast', {name: 'index'});
+		ltl.compile('html\n head\n  title\n   get title\n body\n  get content', {name: 'page'});
+		var result = ltl.cache.index();
+		assert.equal(result, '<!DOCTYPE html><html><head><title>ltl</title></head><body>ltl\nfast</body></html>');
+	});
 });
