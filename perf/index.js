@@ -1,6 +1,6 @@
 var jade = require('jade');
 var dot = require('dot');
-var ltl = require('../lib/ltl');
+var ltl = require('../ltl');
 
 var ltlCode =
 	'html\n' +

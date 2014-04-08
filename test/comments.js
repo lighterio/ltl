@@ -1,4 +1,4 @@
-var ltl = require('../lib/ltl');
+var ltl = require('../ltl');
 var assert = require('assert');
 
 describe('Comments', function () {
