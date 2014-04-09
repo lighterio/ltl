@@ -23,7 +23,7 @@ var ltl = module.exports = (function () {
 
 	// JavaScript tokens that don't need contextVar prepended for interpolation.
 	// TODO: Flesh out this list.
-	var jsPattern = /^(true|false|null|NaN|Infinity|Math)$/;
+	var jsPattern = /^(true|false|null|NaN|Infinity|Math|window)$/;
 
 	// Stores available single character variable names.
 	var vars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$';
