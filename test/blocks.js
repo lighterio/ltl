@@ -3,10 +3,10 @@ var assert = require('assert');
 
 describe('Blocks', function () {
 	it('should work in the middle', function () {
-		var result = ltl.compile('script:\n var a = 1;\n var b = 2;\nbr')();
-		assert.equal(result, '<script>var a = 1;\nvar b = 2;</script><br>');
+		var result = ltl.compile('br\nscript:\n var a = 1;\n var b = 2;\nbr')();
+		assert.equal(result, '<br><script>var a = 1;\nvar b = 2;</script><br>');
 	});
-	it('should work at the end', function () {
+	it('should work at the beginning and end', function () {
 		var result = ltl.compile('script:\n var a = 1;\n var b = 2;')();
 		assert.equal(result, '<script>var a = 1;\nvar b = 2;</script>');
 	});
@@ -31,9 +31,13 @@ describe('Blocks', function () {
 		var result = ltl.compile('p:\n First line.\n Second line.')();
 		assert.equal(result, '<p>First line.\nSecond line.</p>');
 	});
-	it('should remove carriage returns', function () {
+	it('should remove carriage returns and indentation', function () {
 		var result = ltl.compile('p:\n\r First line.\r\n Second line.')();
 		assert.equal(result, '<p>First line.\nSecond line.</p>');
+	});
+	it('should work with attributes', function () {
+		var result = ltl.compile('textarea(rows=3 cols=40):\n 1. Collect underpants\n 2. ?\n 3. Profit!')();
+		assert.equal(result, '<textarea rows=3 cols=40>1. Collect underpants\n2. ?\n3. Profit!</textarea>');
 	});
 	it('should work in the browser', function () {
 		global.window = {

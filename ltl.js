@@ -389,8 +389,12 @@ var ltl = module.exports = (function () {
 
 									// Find quoted attributes or the end of the list.
 									end = rest.search(/[\)"']/);
+
+									// If there's no end, read what's left as attributes.
 									if (end < 0) {
-										throw new Error('Unclosed tag attributes.');
+										attributes += rest;
+										rest = '';
+										break;
 									}
 									character = rest[end];
 
@@ -398,6 +402,7 @@ var ltl = module.exports = (function () {
 									if (character == ')') {
 										attributes += rest.substring(0, end);
 										rest = rest.substring(end + 1);
+										break;
 									}
 
 									// If it's not the end, read a quoted param.

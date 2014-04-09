@@ -50,16 +50,10 @@ describe('Tags', function () {
 			assert.equal(result, '<i id="save" class="icon"></i>');
 		});
 	});
-	describe('Attributes', function () {
-		it('should fail when attributes are unclosed', function () {
-			var failed = false;
-			try {
-				ltl.compile('(blah');
-			}
-			catch (e) {
-				failed = true;
-			}
-			assert(failed);
+	describe('attributes', function () {
+		it('should end attributes when they\'re unclosed', function () {
+			var result = ltl.compile('(blah')();
+			assert.equal(result, '<div blah></div>');
 		});
 		it('should work alone', function () {
 			var result = ltl.compile('a(href="/")')();
@@ -94,7 +88,7 @@ describe('Tags', function () {
 			assert.equal(result, "<img alt='The \'quoted\' text'>");
 		});
 	});
-	describe('Magic', function () {
+	describe('magic', function () {
 		it('should turn ! or doctype into !doctype and assume html', function () {
 			var result = ltl.compile('html\n head\n  title Title\n body Body')();
 			assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
