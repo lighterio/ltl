@@ -35,12 +35,6 @@ describe('Tags', function () {
 			var result = ltl.compile('()')();
 			assert.equal(result, '<div></div>');
 		});
-		it('should turn ! or doctype into !doctype and assume html', function () {
-			var result = ltl.compile('html\n head\n  title Title\n body Body')();
-			assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
-			var result = ltl.compile('!DOCTYPE(test)\nhtml\n head\n  title Title\n body Body')();
-			assert.equal(result, '<!DOCTYPE test><html><head><title>Title</title></head><body>Body</body></html>');
-		});
 	});
 	describe('IDs and classes', function () {
 		it('should work with a tag and ID', function () {
@@ -98,6 +92,22 @@ describe('Tags', function () {
 		it('should work with escaped double quotes.', function () {
 			var result = ltl.compile("img(alt='The \'quoted\' text')")();
 			assert.equal(result, "<img alt='The \'quoted\' text'>");
+		});
+	});
+	describe('Magic', function () {
+		it('should turn ! or doctype into !doctype and assume html', function () {
+			var result = ltl.compile('html\n head\n  title Title\n body Body')();
+			assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
+			var result = ltl.compile('!DOCTYPE(test)\nhtml\n head\n  title Title\n body Body')();
+			assert.equal(result, '<!DOCTYPE test><html><head><title>Title</title></head><body>Body</body></html>');
+		});
+		it('should omit tag when - is used', function () {
+			var result = ltl.compile('p\n - hi')();
+			assert.equal(result, '<p>hi</p>');
+		});
+		it('should omit tag when - is used with a block', function () {
+			var result = ltl.compile('p\n -:\n  hi')();
+			assert.equal(result, '<p>hi</p>');
 		});
 	});
 });

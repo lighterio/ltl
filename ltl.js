@@ -196,6 +196,9 @@ var ltl = module.exports = (function () {
 							if (tag == '//') {
 								inComment = false;
 							}
+							else if (tag == '-') {
+								// Do nothing.
+							}
 							else if (!selfClosePattern.test(tag)) {
 								appendText('html', '</' + tag + '>');
 							}
@@ -445,6 +448,10 @@ var ltl = module.exports = (function () {
 						// If it's a comment, set a boolean so we can ignore its contents.
 						if (tag == '//') {
 							inComment = true;
+						}
+						// If it's a minus, just insert the content.
+						else if (tag == '-') {
+							appendText('html', content);
 						}
 						// If it's not a comment, we'll add some HTML.
 						else {
