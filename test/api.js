@@ -61,4 +61,23 @@ describe('API', function () {
 			assert.func(ltl.compile(''));
 		});
 	});
+	describe('module', function () {
+		it('should populate the window object if it exists', function () {
+			var cache = {};
+			var key;
+			for (key in require.cache) {
+				cache[key] = require.cache[key];
+				delete require.cache[key];
+			}
+			global.window = {};
+			require('ltl');
+			console.log(window.ltl);
+			for (key in cache) {
+				require.cache[key] = cache[key];
+				delete require.cache[key];
+			}
+			var pkg = require('../package.json');
+			assert.equal(pkg.version, window.ltl.version);
+		});
+	});
 });

@@ -2,7 +2,7 @@
  * ltl is a template language designed to be simple, beautiful and fast.
  */
 
-var ltl = module.exports = (function () {
+var ltl = (function () {
 
 	// Allow leniency with tabs and spaces.
 	var tabWidth = 4;
@@ -552,3 +552,10 @@ var ltl = module.exports = (function () {
 	};
 	return ltl;
 })();
+
+if (typeof window == 'undefined') {
+	module.exports = ltl;
+}
+else {
+	window.ltl = ltl;
+}
