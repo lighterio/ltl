@@ -70,7 +70,7 @@ describe('API', function () {
 				delete require.cache[key];
 			}
 			global.window = {};
-			require('ltl');
+			require('../ltl');
 			console.log(window.ltl);
 			for (key in cache) {
 				require.cache[key] = cache[key];
