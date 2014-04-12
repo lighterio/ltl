@@ -439,7 +439,7 @@ var ltl = (function () {
 
 							// If the next character is a space, it's the start of content.
 							else if (character == ' ') {
-								content = escapeSingleQuotes(trim(rest));
+								content = trim(rest);
 								rest = '';
 							}
 

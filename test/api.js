@@ -71,7 +71,6 @@ describe('API', function () {
 			}
 			global.window = {};
 			require('../ltl');
-			console.log(window.ltl);
 			for (key in cache) {
 				require.cache[key] = cache[key];
 				delete require.cache[key];
