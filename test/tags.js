@@ -104,18 +104,4 @@ describe('Tags', function () {
 			assert.equal(result, '<p>hi</p>');
 		});
 	});
-	describe('single quotes', function () {
-		it('should work in content', function () {
-			var result = ltl.compile('p I\'m here!')();
-			assert.equal(result, '<p>I\'m here!</p>');
-		});
-		it('should work in an id', function () {
-			var result = ltl.compile('p#Hawai\'i Aloha')();
-			assert.equal(result, '<p id="Hawai\'i">Aloha</p>');
-		});
-		it('should work in a class', function () {
-			var result = ltl.compile('p.Hawai\'i Aloha')();
-			assert.equal(result, '<p class="Hawai\'i">Aloha</p>');
-		});
-	});
 });

@@ -457,7 +457,7 @@ var ltl = (function () {
 						}
 						// If it's a minus, just insert the content.
 						else if (tag == '-') {
-							appendText('html', content);
+							appendText('html', escapeSingleQuotes(content));
 						}
 						// If it's not a comment, we'll add some HTML.
 						else {
