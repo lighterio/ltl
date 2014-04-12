@@ -54,4 +54,8 @@ describe('Whitespace', function () {
 		var result = ltl.compile('p\n\n b\n  i\ttext\t')();
 		assert.equal(result, PBIT);
 	});
+	it('should handle extra whitespace', function () {
+		var result = ltl.compile('p\n\n b\n      i text')();
+		assert.equal(result, PBIT);
+	});
 });

@@ -187,9 +187,7 @@ var ltl = (function () {
 			function backtrackIndent() {
 				while (stack.length > indent) {
 					var tags = stack.pop();
-					if (tags == '{') {
-						appendText('script', '}');
-					} else {
+					if (tags) {
 						tags = tags.split(/,/g);
 						for (var i = tags.length - 1; i >= 0; i--) {
 							var tag = tags[i];
@@ -197,7 +195,10 @@ var ltl = (function () {
 								inComment = false;
 							}
 							else if (tag == '-') {
-								// Do nothing.
+								// Do nothing. What follows is un-tagged text.
+							}
+							else if (tag == '{') {
+								appendText('script', '}');
 							}
 							else if (!selfClosePattern.test(tag)) {
 								appendText('html', '</' + tag + '>');
