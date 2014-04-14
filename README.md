@@ -112,6 +112,20 @@ they would be inside an HTML tag.
 ```
 Note: Unlike Jade, ltl does not use commas between attributes.
 
+### Untagged Lines
+
+If you want to insert a line of text without wrapping it in a tag,
+just start the line with a minus.
+
+```jade
+h1
+  img(src="/logo.png")
+  - Hello!
+```
+```html
+<h1><img src="/logo.png">Hello!</h1>
+```
+
 ### Blocks
 
 You can output blocks of content using `:`.
@@ -139,7 +153,7 @@ Blocks can be passed through filters, such as markdown.
 
 ### Comments
 
-Line comments and block comments are inserted by using `//` as a tag (at
+Line comments and block comments are added by using `//` as a tag (at
 the beginning of a line). Both are ignored.
 ```jade
 h1 Comments
