@@ -182,8 +182,8 @@ template({name: 'Sam'});
 ```
 
 If you'd like your content to skip HTML encoding (because
-you want your expression to output HTML tags rather than
-text), use `={..}`.
+you want your expression to output raw HTML tags rather
+than safely escaped text), use `={..}`.
 
 Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 ```jade
@@ -191,6 +191,15 @@ Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 ```
 ```html
 <div><script>alert('Gotcha!')</script></div>
+```
+
+If you want to show `${..}` or `={..}` blocks in your output,
+you can escape with a backslash.
+```jade
+code \${escaped} or \={raw}
+```
+```html
+<code>${escaped} or ={raw}
 ```
 
 ### Control
