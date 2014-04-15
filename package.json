@@ -10,7 +10,7 @@
     "jade",
     "dot"
   ],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "ltl",
   "homepage": "http://github.com/zerious/ltl",
   "repository": "git://github.com/zerious/ltl.git",
