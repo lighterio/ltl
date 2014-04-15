@@ -83,7 +83,6 @@ var ltl = (function () {
 			this.setContextVar(contextVar);
 			this.setPartsVar(partsVar);
 
-
 			// Default to empty options.
 			options = options || {};
 
@@ -114,6 +113,7 @@ var ltl = (function () {
 			var output = 'var ' + outputVar + "='";
 
 			var varIndex = 0;
+			var escapeVar = false;
 
 			function appendText(textMode, text) {
 				if (textMode != mode) {
@@ -242,13 +242,16 @@ var ltl = (function () {
 				script = script.replace(/^(else if|else|if)\s*(.*)\s*$/i,
 					function(match, keyword, condition) {
 						found = true;
-						return keyword + (condition ? '(' + interpolate(condition) + ')' : '') + '{';
+						return keyword + (condition ? '(' + contextify(condition) + ')' : '') + '{';
 					});
 
 				return script;
 			}
 
-			function interpolate(code) {
+			/**
+			 * Convert a JavaScripty expression to a scoped expression using contextVar.
+			 */
+			function contextify(code) {
 				var tokens = code.split(/\b/);
 				var isProperty = false;
 				for (var i = 0; i < tokens.length; i++) {
@@ -263,6 +266,26 @@ var ltl = (function () {
 					isProperty = token[token.length - 1] == '.';
 				}
 				return tokens.join('');
+			}
+
+			/**
+			 * Find ${...} and ={...} and turn them into contextified insertions unless escaped.
+			 */
+			function interpolate(code) {
+				return code.replace(/(\\?)([$=])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
+					if (backslash) {
+						return symbol + '{' + expression + '}';
+					}
+					if (symbol == '$') {
+						if (!escapeVar) {
+							escapeVar = vars[varIndex++];
+						}
+						return "'+" + escapeVar + '(' + contextify(expression) + ")+'";
+					}
+					else {
+						return "'+" + contextify(expression) + "+'";
+					}
+				});
 			}
 
 			// If we end up in a dot block, remember the starting indent and filter, and gather lines.
@@ -515,22 +538,12 @@ var ltl = (function () {
 			}
 
 			// Create the function.
-			var escapeVar = 0;
-			output = output.replace(/([\$=])\{([^\}]+)\}/g, function(match, symbol, code) {
-				if (symbol == '$') {
-					if (!escapeVar) {
-						escapeVar = vars[varIndex++];
-					}
-					return "'+" + escapeVar + '(' + interpolate(code) + ")+'";
-				}
-				else {
-					return "'+" + interpolate(code) + "+'";
-				}
-			});
+			output = interpolate(output); // TODO: Break up to allow non-interpolated blocks?
 			if (escapeVar) {
 				output = "function " + escapeVar + "(t){" +
 					"var r={'<':'&lt;','&':'&amp;','>':'&gt;'};" +
-					"return (''+t).replace(/[<&>]/g,function(m){return r[m]})};" + output;
+					"return (''+t).replace(/[<&>]/g,function(m){return r[m]})};" +
+					interpolate(output);
 			}
 			output = 'eval.f=function(' + contextVar + (hasGets ? ',' + partsVar : '') + '){' + output + '}';
 			try {
