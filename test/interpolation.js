@@ -11,10 +11,16 @@ describe('Interpolation', function () {
 	});
 	describe('Output', function () {
 		it('should be escapable or not', function () {
-			var result = ltl.compile('p #{text}')({text: '<&>'});
+			var result = ltl.compile('p ${text}')({text: '<&>'});
 			assert.equal(result, '<p>&lt;&amp;&gt;</p>');
 			var result = ltl.compile('p ={text}')({text: '<&>'});
 			assert.equal(result, '<p><&></p>');
+		});
+		it('should work in a block', function () {
+			var result = ltl.compile('p:\n ${text}')({text: 'Should be <escaped>.'});
+			assert.equal(result, '<p>Should be &lt;escaped&gt;.</p>');
+			var result = ltl.compile('p:\n ={text}')({text: 'Should be <unescaped>.'});
+			assert.equal(result, '<p>Should be <unescaped>.</p>');
 		});
 	});
 });

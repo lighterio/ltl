@@ -169,9 +169,11 @@ p Hello from http://lighter.io/ltl
 
 ### Interpolation
 
-You can output the value of a context property with `#{..}`.
+You can output the value of a context property with `${..}`,
+and special HTML characters will be escaped for you to
+prevent silly little XSS attacks.
 ```javascript
-var code = '. Hello #{name}!';
+var code = '. Hello ${name}!';
 var template = ltl.compile(code)
 template({name: 'Sam'});
 ```
@@ -181,7 +183,7 @@ template({name: 'Sam'});
 
 If you'd like your content to skip HTML encoding (because
 you want your expression to output HTML tags rather than
-text, use `={..}`.
+text), use `={..}`.
 
 Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 ```jade

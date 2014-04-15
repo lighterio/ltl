@@ -516,8 +516,8 @@ var ltl = (function () {
 
 			// Create the function.
 			var escapeVar = 0;
-			output = output.replace(/([#=])\{([^\}]+)\}/g, function(match, symbol, code) {
-				if (symbol == '#') {
+			output = output.replace(/([\$=])\{([^\}]+)\}/g, function(match, symbol, code) {
+				if (symbol == '$') {
 					if (!escapeVar) {
 						escapeVar = vars[varIndex++];
 					}

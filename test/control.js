@@ -4,14 +4,14 @@ var assert = require('assert');
 describe('Control', function () {
 	describe('for..in', function () {
 		it('should iterate over a list', function () {
-			var template = ltl.compile('ul\n for item in list\n  li #{item}');
+			var template = ltl.compile('ul\n for item in list\n  li ${item}');
 			var result = template({list:['a', 'b']});
 			assert.equal(result, '<ul><li>a</li><li>b</li></ul>');
 		});
 	});
 	describe('for..of', function () {
 		it('should iterate over an object', function () {
-			var template = ltl.compile('ul\n for key, value of object\n  li #{key}: #{value}');
+			var template = ltl.compile('ul\n for key, value of object\n  li ${key}: ${value}');
 			var result = template({object: {a: 1, b: 2}});
 			assert.equal(result, '<ul><li>a: 1</li><li>b: 2</li></ul>');
 		});

@@ -6,12 +6,12 @@ describe('Call', function () {
 		assert.object(ltl.cache);
 	});
 	it('should put templates in the cache', function () {
-		ltl.compile('b #{text}', {name: 'bold'});
+		ltl.compile('b ${text}', {name: 'bold'});
 		assert.func(ltl.cache.bold);
 	});
 	it('should call a template from the middle of another template', function () {
 		ltl.compile('p\n call common', {name: 'temp'});
-		ltl.compile('b #{text}', {name: 'common'});
+		ltl.compile('b ${text}', {name: 'common'});
 		var result = ltl.cache.temp({text: 'Hi!'});
 		assert.equal(result, '<p><b>Hi!</b></p>');
 	});
