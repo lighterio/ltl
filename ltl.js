@@ -169,6 +169,12 @@ var ltl = (function () {
 				}
 				// If there's a filter, get its module.
 				else if (blockFilter) {
+					if (blockFilter == 'coffee') {
+						blockFilter = 'coffee-script';
+					}
+					else if (blockFilter == 'md') {
+						blockFilter = 'markdown';
+					}
 					try {
 						if (inBrowser) {
 							blockFilter = window[blockFilter];
@@ -192,6 +198,8 @@ var ltl = (function () {
 				else if (typeof blockFilter == 'function') {
 					text = blockFilter(text);
 				}
+
+				text = trim(text);
 
 				if (options.space) {
 					text = ('\n' + text).replace(/\n/g, '\n' + repeat(options.space, tagDepth));

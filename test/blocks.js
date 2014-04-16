@@ -11,7 +11,7 @@ describe('Blocks', function () {
 		assert.equal(result, '<script>var a = 1;\nvar b = 2;</script>');
 	});
 	it('should work with markdown', function () {
-		var result = ltl.compile('p:markdown\n Heading\n =====')();
+		var result = ltl.compile('p:md\n Heading\n =====')();
 		var hasHeading = /<h1>Heading<\/h1>/.test(result);
 		assert(hasHeading);
 	});
@@ -23,7 +23,7 @@ describe('Blocks', function () {
 		assert(startsWithDiv);
 	});
 	it('should work with CoffeeScript', function () {
-		var result = ltl.compile('script:coffee-script\n a = 1')();
+		var result = ltl.compile('script:coffee\n a = 1')();
 		var hasVar = /var/.test(result);
 		assert(hasVar);
 	});
