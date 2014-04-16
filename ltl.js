@@ -13,7 +13,7 @@ var ltl = (function () {
 	var partsVar = 'p';
 
 	// Some HTML tags won't have end tags.
-	var selfClosePattern = /^(!DOCTYPE|br|hr|img|input)\b/;
+	var selfClosePattern = /^(!DOCTYPE|br|hr|img|input|-|\/\/)(\b|$)/;
 
 	// Supported control keywords (usage appears like tags).
 	var controlPattern = /^(for|if|else|else if)\b/;
@@ -31,6 +31,11 @@ var ltl = (function () {
 	// Remove starting/ending whitespace.
 	function trim(text) {
 		return text.replace(/(^\s+|\s+$)/g, '');
+	}
+
+	// Remove starting/ending whitespace.
+	function repeat(text, times) {
+		return (new Array(times + 1)).join(text);
 	}
 
 	// Escape single quotes with a backslash.
@@ -86,6 +91,10 @@ var ltl = (function () {
 			// Default to empty options.
 			options = options || {};
 
+			if (options.space) {
+				options.space = escapeBlock(options.space);
+			}
+
 			// Find out if we're in the browser.
 			var inBrowser = false;
 			try {
@@ -110,6 +119,9 @@ var ltl = (function () {
 			var indent = 0;
 			var stack = [];
 			var mode = 'html';
+			var previousTag;
+			var hasHtmlOutput = false;
+			var tagDepth = 0;
 			var output = 'var ' + outputVar + "='";
 
 			var varIndex = 0;
@@ -181,6 +193,11 @@ var ltl = (function () {
 					text = blockFilter(text);
 				}
 
+				if (options.space) {
+					text = ('\n' + text).replace(/\n/g, '\n' + repeat(options.space, tagDepth));
+					text += '\n' + repeat(options.space, tagDepth - 1);
+				}
+
 				appendText('html', escapeBlock(text));
 			}
 
@@ -201,7 +218,15 @@ var ltl = (function () {
 								appendText('script', '}');
 							}
 							else if (!selfClosePattern.test(tag)) {
-								appendText('html', '</' + tag + '>');
+								var html = '</' + tag + '>';
+								tagDepth--;
+								if (tag == previousTag) {
+									previousTag = null;
+								}
+								else if (options.space) {
+									html = '\\n' + repeat(options.space, tagDepth) + html;
+								}
+								appendText('html', html);
 							}
 						}
 					}
@@ -500,11 +525,21 @@ var ltl = (function () {
 							}
 							html = escapeSingleQuotes('<' + html + '>' + content);
 							if (tag == 'html' && !/DOCTYPE/.test(output)) {
-								html = '<!DOCTYPE html>' + html;
+								html = '<!DOCTYPE html>' + (options.space ? '\\n' : '') + html;
+							}
+
+							// Prepend whitespace if requested via options.space.
+							if (options.space) {
+								html = repeat(options.space, tagDepth) + html;
+								// Prepend a line break if this isn't the first tag.
+								if (hasHtmlOutput) {
+									html = '\\n' + html;
+								}
 							}
 
 							// Add the HTML to the template function output.
 							appendText('html', html);
+							hasHtmlOutput = true;
 						}
 
 						// Make sure we can close this tag.
@@ -514,6 +549,13 @@ var ltl = (function () {
 						else {
 							stack[indent] = tag;
 						}
+
+						// Allow same-line tag open/close in options.space mode.
+						previousTag = tag;
+						if (!selfClosePattern.test(tag)) {
+							tagDepth++;
+						}
+
 						tag = '';
 						id = '';
 						className = '';
