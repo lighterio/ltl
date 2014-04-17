@@ -200,10 +200,9 @@ var ltl = (function () {
 				}
 
 				text = trim(text);
-
 				if (options.space) {
 					text = ('\n' + text).replace(/\n/g, '\n' + repeat(options.space, tagDepth));
-					text += '\n' + repeat(options.space, tagDepth - 1);
+					text += (previousTag == '-' ? '' : '\n') + repeat(options.space, tagDepth - 1);
 				}
 
 				appendText('html', escapeBlock(text));
