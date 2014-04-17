@@ -52,7 +52,7 @@ var ltl = (function () {
 	var ltl = {
 
 		// Allow users to see what version of ltl they're using.
-		version: '0.0.3',
+		version: '0.0.4',
 
 		// Store all of the templates that have been compiled.
 		cache: {},

@@ -1,7 +1,8 @@
 {
   "name": "ltl",
-  "description": "Lightweight Template Language for JavaScript and HTML",
+  "description": "Lean Template Language for JavaScript and HTML",
   "keywords": [
+    "lean",
     "lightweight",
     "fast",
     "simple",
@@ -10,7 +11,7 @@
     "jade",
     "dot"
   ],
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "ltl",
   "homepage": "http://github.com/zerious/ltl",
   "repository": "git://github.com/zerious/ltl.git",
