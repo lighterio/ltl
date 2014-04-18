@@ -202,7 +202,7 @@ var ltl = (function () {
 				text = trim(text);
 				if (options.space) {
 					text = ('\n' + text).replace(/\n/g, '\n' + repeat(options.space, tagDepth));
-					text += (previousTag == '-' ? '' : '\n') + repeat(options.space, tagDepth - 1);
+					text += '\n' + repeat(options.space, tagDepth - 1);
 				}
 
 				appendText('html', escapeBlock(text));
@@ -512,10 +512,17 @@ var ltl = (function () {
 						}
 						// If it's a minus, just insert the content.
 						else if (tag == '-') {
-							appendText('html', escapeSingleQuotes(content));
+							html = escapeSingleQuotes(content);
+							if (options.space) {
+								html = '\\n' + repeat(options.space, tagDepth) + html;
+							}
+							appendText('html', html);
 						}
 						// If it's not a comment, we'll add some HTML.
 						else {
+							if (!tag) {
+								console.log(blockFilter);
+							}
 							// Default to a <div> if we don't know what tag it is.
 							tag = tag || 'div';
 

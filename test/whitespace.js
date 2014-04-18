@@ -79,9 +79,9 @@ describe('Whitespace', function () {
 			var result = ltl.compile('p:\n Hello', {space: '\t'})();
 			assert.equal(result, '<p>\n\tHello\n</p>');
 		});
-		it('should not break after untagged blocks', function () {
-			var result = ltl.compile('p\n -:\n  a\n -:\n  b', {space: '  '})();
-			assert.equal(result, '<p>\n  a\n  b\n</p>');
+		it('should break before untagged lines', function () {
+			var result = ltl.compile('br\n- text', {space: '  '})();
+			assert.equal(result, '<br>\ntext');
 		});
 	});
 });
