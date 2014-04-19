@@ -520,9 +520,6 @@ var ltl = (function () {
 						}
 						// If it's not a comment, we'll add some HTML.
 						else {
-							if (!tag) {
-								console.log(blockFilter);
-							}
 							// Default to a <div> if we don't know what tag it is.
 							tag = tag || 'div';
 
