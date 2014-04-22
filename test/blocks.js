@@ -27,6 +27,15 @@ describe('Blocks', function () {
 		var hasVar = /var/.test(result);
 		assert(hasVar);
 	});
+	it('should unwrap CoffeeScript with NOWRAP', function () {
+		var result = ltl.compile('script:coffee\n # NOWRAP\n a = 1')();
+		var hasVar = /var/.test(result);
+		assert(hasVar);
+		var hasFunction = /function/.test(result);
+		assert(!hasFunction);
+		var hasCall = /call/.test(result);
+		assert(!hasCall);
+	});
 	it('should work with text with line breaks', function () {
 		var result = ltl.compile('p:\n First line.\n Second line.')();
 		assert.equal(result, '<p>First line.\nSecond line.</p>');

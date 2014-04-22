@@ -190,7 +190,11 @@ var ltl = (function () {
 
 				// Detect the module's API, and filter the text.
 				if (blockFilter.compile) {
+					var nowrap = /^[^A-Z]*NOWRAP/.test(text);
 					text = blockFilter.compile(text);
+					if (nowrap) {
+						text = text.replace(/(^\(function\(\) \{\s*|\s*\}\)\.call\(this\);\s*$)/g, '');
+					}
 				}
 				else if (blockFilter.markdown) {
 					text = blockFilter.markdown.toHTML(text);
