@@ -2,7 +2,7 @@
  * ltl is a template language designed to be simple, beautiful and fast.
  */
 
-var ltl = (function () {
+(function () {
 
 	// Allow leniency with tabs and spaces.
 	var tabWidth = 4;
@@ -13,7 +13,7 @@ var ltl = (function () {
 	var partsVar = 'p';
 
 	// Some HTML tags won't have end tags.
-	var selfClosePattern = /^(!DOCTYPE|br|hr|img|input|-|\/\/)(\b|$)/;
+	var selfClosePattern = /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/)(\b|$)/;
 
 	// Supported control keywords (usage appears like tags).
 	var controlPattern = /^(for|if|else|else if)\b/;
@@ -621,12 +621,12 @@ var ltl = (function () {
 			return template;
 		}
 	};
-	return ltl;
-})();
 
-if (typeof window == 'undefined') {
-	module.exports = ltl;
-}
-else {
-	window.ltl = ltl;
-}
+	if (typeof window == 'undefined') {
+		module.exports = ltl;
+	}
+	else {
+		window.ltl = ltl;
+	}
+
+})();

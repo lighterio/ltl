@@ -13,6 +13,7 @@ var ltlCode =
 	'    li ={item}\n';
 
 var jadeCode =
+	'doctype html\n' +
 	'html\n' +
 	' head\n' +
 	'  title Hello World\n' +
@@ -22,13 +23,13 @@ var jadeCode =
 	'   each item in items\n' +
 	'    li #{item}\n';
 
-var dotCode = '<html><head><title>Hello World</title></head>' +
+var dotCode = '<!DOCTYPE html><html><head><title>Hello World</title></head>' +
 	'<body><div id="hey" class="a b" style="display:block;width:100px">' +
 	'Here\'s my message: {{=it.message}}</div><ul>{{' +
 	'for(var i=0;i<it.items.length;++i){it.item=it.items[i]; }}' +
 	'<li>{{=it.item}}</li>{{ } }}</ul></body></html>';
 
-var context = {message: 'hello', items: ['apple', 'banana', 'orange', 'pear']};
+var context = {message: 'hello', items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']};
 
 console.log('');
 console.log('doT:');
