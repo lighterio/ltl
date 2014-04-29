@@ -1,6 +1,8 @@
 var ltl = require('../ltl');
 var assert = require('assert-plus');
 
+require('zeriousify').test();
+
 describe('API', function () {
 	describe('ltl', function () {
 		it('should be an object', function () {

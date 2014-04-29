@@ -4,6 +4,7 @@ var assert = require('assert');
 describe('Comments', function () {
 	it('should be omitted', function () {
 		var result = ltl.compile('// Comment')();
+		assert.equal(result, '');
 		var result = ltl.compile('p before\n// Comment\np after')();
 		assert.equal(result, '<p>before</p><p>after</p>');
 	});
