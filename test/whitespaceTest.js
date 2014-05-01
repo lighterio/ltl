@@ -83,5 +83,9 @@ describe('Whitespace', function () {
 			var result = ltl.compile('br\n- text', {space: '  '})();
 			assert.equal(result, '<br>\ntext');
 		});
+		it('should work with tagless blocks', function () {
+			var result = ltl.compile(':\n blah', {space: ' '})();
+			assert.equal(result, 'blah');
+		});
 	});
 });

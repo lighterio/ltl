@@ -205,11 +205,19 @@
 
 				text = trim(text);
 				if (options.space) {
-					text = ('\n' + text).replace(/\n/g, '\n' + repeat(options.space, tagDepth));
-					text += '\n' + repeat(options.space, tagDepth - 1);
+					if (hasHtmlOutput) {
+						text = '\n' + text;
+					}
+					text = text.replace(/\n/g, '\n' + repeat(options.space, tagDepth));
+					if (blockTag) {
+						text += '\n' + repeat(options.space, tagDepth - 1);
+					}
 				}
 
 				appendText('html', escapeBlock(text));
+
+				blockTag = null;
+				blockFilter = null;
 			}
 
 			function backtrackIndent() {
@@ -328,6 +336,7 @@
 			var blockIndent = 0;
 			var blockFilter = '';
 			var blockLines = [];
+			var blockTag = null;
 
 			var blockName = '';
 			var blockSets = [];
@@ -491,6 +500,7 @@
 
 							// If the next character is a colon, enter a block.
 							else if (character == ':') {
+								blockTag = tag;
 								startBlock(trim(rest.substring(1)));
 								rest = '';
 								break;
@@ -505,7 +515,8 @@
 							// If the next character isn't special, it's part of a tag.
 							else {
 								end = rest.search(/([#\.\(>:\s]|$)/);
-								tag = rest.substring(0, end);
+								// Prevent overwriting the tag.
+								tag = tag || rest.substring(0, end);
 								rest = rest.substring(end);
 							}
 						}
@@ -524,8 +535,13 @@
 						}
 						// If it's not a comment, we'll add some HTML.
 						else {
-							// Default to a <div> if we don't know what tag it is.
-							tag = tag || 'div';
+							// Default to a <div> unless we're in a tagless block.
+							if (!tag) {
+								var useDefault = (blockTag === null) || id || className || attributes;
+								if (useDefault) {
+									tag = blockTag = 'div';
+								}
+							}
 
 							// Add attributes to the tag.
 							var html = tag;
@@ -553,22 +569,27 @@
 							}
 
 							// Add the HTML to the template function output.
-							appendText('html', html);
-							hasHtmlOutput = true;
+							if (tag) {
+								appendText('html', html);
+								hasHtmlOutput = true;
+							}
 						}
 
-						// Make sure we can close this tag.
-						if (stack[indent]) {
-							stack[indent] += ',' + tag;
-						}
-						else {
-							stack[indent] = tag;
-						}
+						if (tag) {
 
-						// Allow same-line tag open/close in options.space mode.
-						previousTag = tag;
-						if (!selfClosePattern.test(tag)) {
-							tagDepth++;
+							// Make sure we can close this tag.
+							if (stack[indent]) {
+								stack[indent] += ',' + tag;
+							}
+							else {
+								stack[indent] = tag;
+							}
+
+							// Allow same-line tag open/close in options.space mode.
+							previousTag = tag;
+							if (!selfClosePattern.test(tag)) {
+								tagDepth++;
+							}
 						}
 
 						tag = '';

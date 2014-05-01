@@ -87,6 +87,10 @@ describe('Tags', function () {
 			var result = ltl.compile("img(alt='The \'quoted\' text')")();
 			assert.equal(result, "<img alt='The \'quoted\' text'>");
 		});
+		it('should ignore crap after attributes.', function () {
+			var result = ltl.compile('p(id="p")crap blah')();
+			assert.equal(result, '<p id="p">blah</p>');
+		});
 	});
 	describe('magic', function () {
 		it('should turn ! or doctype into !doctype and assume html', function () {
