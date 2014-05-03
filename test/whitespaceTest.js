@@ -79,13 +79,13 @@ describe('Whitespace', function () {
 			var result = ltl.compile('p:\n Hello', {space: '\t'})();
 			assert.equal(result, '<p>\n\tHello\n</p>');
 		});
-		it('should break before untagged lines', function () {
-			var result = ltl.compile('br\n- text', {space: '  '})();
-			assert.equal(result, '<br>\ntext');
-		});
 		it('should work with tagless blocks', function () {
 			var result = ltl.compile(':\n blah', {space: ' '})();
 			assert.equal(result, 'blah');
+		});
+		it('should work with comments', function () {
+			var result = ltl.compile('br\n- text\nbr', {space: '  '})();
+			assert.equal(result, '<br>\n<!--text-->\n<br>');
 		});
 	});
 });

@@ -162,8 +162,8 @@ Blocks can be passed through filters, such as markdown.
 
 ### Comments
 
-Line comments and block comments are added by using `//` as a tag (at
-the beginning of a line). Both are ignored.
+Ltl comments are added by using `//` as a tag, and they do not output any
+HTML. The `//` tag can be used on one line or as a block.
 ```jade
 h1 Comments
 // No one will see this.
@@ -174,6 +174,18 @@ p Hello from http://lighter.io/ltl
 ```
 ```html
 <h1>Comments</h1><p>Hello from http://lighter.io/ltl</p>
+```
+
+HTML comments are add by using `-` as a tag.
+```jade
+- Begin page
+p Hello
+- End page
+-
+  p Delete me
+```
+```html
+<!--Begin page--><p>Hello</p><!--End page--><!--<p>Delete me</p>-->
 ```
 
 ### Interpolation

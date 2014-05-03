@@ -233,7 +233,7 @@
 								inComment = false;
 							}
 							else if (tag == '-') {
-								// Do nothing. What follows is un-tagged text.
+								appendText('html', '-->');
 							}
 							else if (tag == '{') {
 								appendText('script', '}');
@@ -531,14 +531,6 @@
 						if (tag == '//') {
 							inComment = true;
 						}
-						// If it's a minus, just insert the content.
-						else if (tag == '-') {
-							html = escapeSingleQuotes(content);
-							if (options.space) {
-								html = '\\n' + repeat(options.space, tagDepth) + html;
-							}
-							appendText('html', html);
-						}
 						// If it's not a comment, we'll add some HTML.
 						else {
 							// Default to a <div> unless we're in a tagless block.
@@ -549,7 +541,7 @@
 								}
 							}
 
-							// Convert ! or doctype into !DOCTYPE and assume html
+							// Convert ! or doctype into !DOCTYPE and assume html.
 							if (tag == '!' || tag == 'doctype') {
 								tag = '!DOCTYPE';
 								attributes = attributes || 'html';
@@ -566,7 +558,16 @@
 							if (attributes) {
 								html += ' ' + attributes;
 							}
-							html = escapeSingleQuotes('<' + html + '>' + content);
+
+							// Convert minus to a comment.
+							if (tag == '-') {
+								html = '<!--' + content;
+							}
+							else {
+								html = '<' + html + '>' + content;
+							}
+
+							html = escapeSingleQuotes(html);
 							if (tag == 'html' && !/DOCTYPE/.test(output)) {
 								html = '<!DOCTYPE html>' + (options.space ? '\\n' : '') + html;
 							}

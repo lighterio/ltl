@@ -19,7 +19,7 @@ describe('Single quotes', function () {
 		assert.equal(result, '<img alt="I\'m an image" src="img.png">');
 	});
 	it('should work without a tag', function () {
-		var result = ltl.compile('- I\'m here!')();
+		var result = ltl.compile(': I\'m here!')();
 		assert.equal(result, 'I\'m here!');
 	});
 	it('should work in a block', function () {

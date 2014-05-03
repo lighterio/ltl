@@ -113,12 +113,8 @@ describe('Tags', function () {
 			var result = ltl.compile('!DOCTYPE(svg)')();
 			assert.equal(result, '<!DOCTYPE svg>');
 		});
-		it('should omit tag when - is used', function () {
-			var result = ltl.compile('p\n - hi')();
-			assert.equal(result, '<p>hi</p>');
-		});
-		it('should omit tag when - is used with a block', function () {
-			var result = ltl.compile('p\n -:\n  hi')();
+		it('should omit tag with a tagless block', function () {
+			var result = ltl.compile('p\n :\n  hi')();
 			assert.equal(result, '<p>hi</p>');
 		});
 	});
