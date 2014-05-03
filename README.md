@@ -73,7 +73,15 @@ html
   </body>
 </html>
 ```
-Note: `<!DOCTYPE html>` is automagically inserted before an `<html>` tag.
+
+`<!DOCTYPE html>` is automagically inserted before an `<html>` tag.  If you would like to specify a custom doctype, you can use the shorthand `doctype` or `!` syntax.
+```jade
+!(svg)
+```
+
+```html
+<!DOCTYPE svg>
+```
 
 Nesting can also be done with one-liners using `>`.
 ```jade

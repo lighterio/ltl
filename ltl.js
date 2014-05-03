@@ -186,6 +186,8 @@
 					catch (e) {
 						throw new Error('Unknown filter "' + blockFilter + '". Try "npm install ' + blockFilter + '" first.');
 					}
+				} else {
+					blockFilter = 'text';
 				}
 
 				// Detect the module's API, and filter the text.
@@ -501,7 +503,11 @@
 							// If the next character is a colon, enter a block.
 							else if (character == ':') {
 								blockTag = tag;
-								startBlock(trim(rest.substring(1)));
+								rest = rest.substring(1).split(' ');
+								startBlock(rest.shift());
+								if (rest.length > 0) {
+									blockLines.push(rest.join(' '));
+								}
 								rest = '';
 								break;
 							}
@@ -541,6 +547,12 @@
 								if (useDefault) {
 									tag = blockTag = 'div';
 								}
+							}
+
+							// Convert ! or doctype into !DOCTYPE and assume html
+							if (tag == '!' || tag == 'doctype') {
+								tag = '!DOCTYPE';
+								attributes = attributes || 'html';
 							}
 
 							// Add attributes to the tag.

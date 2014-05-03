@@ -66,4 +66,16 @@ describe('Blocks', function () {
 		}
 		assert(error);
 	});
+	it('should allow filterless blocks', function () {
+		var result = ltl.compile('p:\n a\n b')();
+		assert.equal(result, '<p>a\nb</p>');
+	});
+	it('should add inline content', function () {
+		var result = ltl.compile('p: a')();
+		assert.equal(result, '<p>a</p>');
+	});
+	it('should allow mixed content', function () {
+		var result = ltl.compile('p: a\n b')();
+		assert.equal(result, '<p>a\nb</p>');
+	});
 });

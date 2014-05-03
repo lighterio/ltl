@@ -93,11 +93,25 @@ describe('Tags', function () {
 		});
 	});
 	describe('magic', function () {
-		it('should turn ! or doctype into !doctype and assume html', function () {
+		it('should auto-insert <!DOCTYPE html>', function () {
 			var result = ltl.compile('html\n head\n  title Title\n body Body')();
 			assert.equal(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>');
+		});
+		it('should allow doctypes other than html', function () {
 			var result = ltl.compile('!DOCTYPE(test)\nhtml\n head\n  title Title\n body Body')();
 			assert.equal(result, '<!DOCTYPE test><html><head><title>Title</title></head><body>Body</body></html>');
+		});
+		it('should turn ! or doctype into <!DOCTYPE> and assume html', function () {
+			var result = ltl.compile('!')();
+			assert.equal(result, '<!DOCTYPE html>');
+			var result = ltl.compile('doctype')();
+			assert.equal(result, '<!DOCTYPE html>');
+		});
+		it('should allow other doctypes', function () {
+			var result = ltl.compile('!(svg)')();
+			assert.equal(result, '<!DOCTYPE svg>');
+			var result = ltl.compile('!DOCTYPE(svg)')();
+			assert.equal(result, '<!DOCTYPE svg>');
 		});
 		it('should omit tag when - is used', function () {
 			var result = ltl.compile('p\n - hi')();
