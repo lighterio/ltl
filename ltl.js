@@ -4,14 +4,6 @@
 
 (function () {
 
-	// Allow leniency with tabs and spaces.
-	var tabWidth = 4;
-
-	// Local variable names within outputted template functions.
-	var contextVar = 'c';
-	var outputVar = 'o';
-	var partsVar = 'p';
-
 	// Some HTML tags won't have end tags.
 	var selfClosePattern = /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/)(\b|$)/;
 
@@ -26,7 +18,7 @@
 	var jsPattern = /^(true|false|null|NaN|Infinity|Math|window)$/;
 
 	// Stores available single character variable names.
-	var vars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$';
+	var varCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$';
 
 	// Remove starting/ending whitespace.
 	function trim(text) {
@@ -55,41 +47,37 @@
 		version: '0.1.1',
 
 		// Store all of the templates that have been compiled.
-		cache: {},
+		_cache: {},
 
-		// Allow users to customize the tab width (default: 4).
-		setTabWidth: function (value) {
-			tabWidth = value;
+		// Default compile options.
+		_options: {
+			tabWidth: 4,
+			outputVar: 'o',
+			contextVar: 'c',
+			partsVar: 'p'
 		},
 
-		// Allow users to customize the template output variable (default: 'o').
-		setOutputVar: function (value) {
-			outputVar = value;
-			vars = vars.replace(outputVar, '');
-		},
-
-		// Allow users to customize the template context argument (default: 'c').
-		setContextVar: function (value) {
-			contextVar = value;
-			vars = vars.replace(contextVar, '');
-		},
-
-		// Allow users to customize the template parts argument (default: 'p').
-		setPartsVar: function (value) {
-			partsVar = value;
-			vars = vars.replace(partsVar, '');
+		// Change compile options.
+		setOption: function (name, value) {
+			this._options[name] = value;
 		},
 
 		// Create a function that accepts context and returns markup.
 		compile: function (code, options) {
 
-			// Prevent variable conflicts.
-			this.setOutputVar(outputVar);
-			this.setContextVar(contextVar);
-			this.setPartsVar(partsVar);
-
-			// Default to empty options.
+			// Copy default options.
 			options = options || {};
+			for (var name in this._options) {
+				if (typeof options[name] == 'undefined') {
+					options[name] = this._options[name];
+				}
+			}
+
+			// Don't allow context/output/parts vars to become user vars.
+			var vars = varCharacters;
+			vars = vars.replace(options.contextVar, '');
+			vars = vars.replace(options.outputVar, '');
+			vars = vars.replace(options.partsVar, '');
 
 			if (options.space) {
 				options.space = escapeBlock(options.space);
@@ -107,7 +95,7 @@
 			code = code.replace(/\r/g, '');
 
 			// Be lenient with mixed tabs and spaces, assuming tab width of 4.
-			var tabReplacement = Array(tabWidth + 1).join(' ');
+			var tabReplacement = Array(options.tabWidth + 1).join(' ');
 			code = code.replace(/\t/g, tabReplacement);
 
 			// We'll auto-detect tab width.
@@ -122,7 +110,7 @@
 			var previousTag;
 			var hasHtmlOutput = false;
 			var tagDepth = 0;
-			var output = 'var ' + outputVar + "='";
+			var output = 'var ' + options.outputVar + "='";
 
 			var varIndex = 0;
 			var escapeVar = false;
@@ -132,7 +120,7 @@
 					if (mode == 'html') {
 						output += "'" + (text == '}' ? '' : ';');
 					} else {
-						output += outputVar + "+='";
+						output += options.outputVar + "+='";
 					}
 					mode = textMode;
 				}
@@ -153,7 +141,7 @@
 
 				// If we're in a "call" block, compile the contents.
 				if (blockFilter == 'call') {
-					appendText('html', "'+this['" + blockName + "'].call(this," + contextVar + (text ? ',' + ltl.compile(text) : '') + ")+'");
+					appendText('html', "'+this['" + blockName + "'].call(this," + options.contextVar + (text ? ',' + ltl.compile(text) : '') + ")+'");
 					return;
 				}
 				// For a "set" block.
@@ -255,7 +243,7 @@
 			}
 
 			function transformScript(script) {
-				var c = contextVar;
+				var c = options.contextVar;
 				var found = false;
 
 				script = script.replace(/^(for)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s+in\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
@@ -305,7 +293,7 @@
 					if (/^[a-z_]/i.test(token)) {
 						if (!jsPattern.test(token)) {
 							if (!isProperty) {
-								tokens[i] = contextVar + '.' + token;
+								tokens[i] = options.contextVar + '.' + token;
 							}
 						}
 					}
@@ -404,7 +392,7 @@
 					pair = blockName.split(':');
 					blockName = pair[0];
 					if (command == 'get') {
-						appendText('html', "'+" + partsVar + "['" + blockName + "'](" + contextVar + ")+'");
+						appendText('html', "'+" + options.partsVar + "['" + blockName + "'](" + options.contextVar + ")+'");
 						hasGets = true;
 					}
 					else {
@@ -622,7 +610,7 @@
 			backtrackIndent();
 
 			// Add the return statement (ending concatenation, where applicable).
-			appendText('script', 'return ' + outputVar);
+			appendText('script', 'return ' + options.outputVar);
 
 			if (blockSets.length) {
 				return '{' + blockSets.join(',') + '}';
@@ -636,7 +624,7 @@
 					"return (''+t).replace(/[<&>]/g,function(m){return r[m]})};" +
 					interpolate(output);
 			}
-			output = 'eval.f=function(' + contextVar + (hasGets ? ',' + partsVar : '') + '){' + output + '}';
+			output = 'eval.f=function(' + options.contextVar + (hasGets ? ',' + options.partsVar : '') + '){' + output + '}';
 			try {
 				eval(output);
 			}
@@ -649,7 +637,7 @@
 
 			// If there's a name specified, cache the template with that name.
 			if (options.name) {
-				this.cache[options.name] = template;
+				this._cache[options.name] = template;
 			}
 
 			return template;

@@ -36,7 +36,7 @@ describe('Whitespace', function () {
 		assert.equal(result, PBI);
 	});
 	it('should work with mixed tabs and spaces', function () {
-		ltl.setTabWidth(2);
+		ltl.setOption("tabWidth", 2);
 		var result = ltl.compile('p\n\n\tb\n    i')();
 		assert.equal(result, PBI);
 	});

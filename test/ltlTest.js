@@ -16,41 +16,53 @@ describe('API', function () {
 			assert.equal(pkg.version, ltl.version);
 		});
 	});
-	describe('ltl.setTabWidth(int)', function () {
+	describe('ltl.setOption("tabWidth", int)', function () {
 		it('should modify tab/space leniency', function () {
-			ltl.setTabWidth(1);
+			ltl.setOption("tabWidth", 1);
 			var result = ltl.compile('ul\n li\n\tli')();
 			assert.equal(result, '<ul><li></li><li></li></ul>');
-			ltl.setTabWidth(2);
+			ltl.setOption("tabWidth", 2);
 			var result = ltl.compile('ul\n li\n\tli')();
 			assert.equal(result, '<ul><li><li></li></li></ul>');
-			ltl.setTabWidth(4);
+			ltl.setOption("tabWidth", 4);
 		});
 	});
-	describe('ltl.setOutputVar(string)', function () {
+	describe('ltl.setOption("outputVar", string)', function () {
 		it('should modify output variable', function () {
-			ltl.setOutputVar('html');
+			ltl.setOption("outputVar", 'html');
 			var code = ltl.compile('p').toString();
 			assert.equal(code, "function (c){var html='<p></p>';return html}");
-			ltl.setOutputVar('o');
+			ltl.setOption("outputVar", 'o');
 			var code = ltl.compile('p').toString();
 			assert.equal(code, "function (c){var o='<p></p>';return o}");
 		});
+		it('should override output variable', function () {
+			var code = ltl.compile('p', {outputVar: 'out'}).toString();
+			assert.equal(code, "function (c){var out='<p></p>';return out}");
+		});
 	});
-	describe('ltl.setContextVar(string)', function () {
+	describe('ltl.setOption("contextVar", string)', function () {
 		it('should modify context variable', function () {
-			ltl.setContextVar('context');
+			ltl.setOption("contextVar", 'context');
 			var code = ltl.compile('p').toString();
 			assert.equal(code, "function (context){var o='<p></p>';return o}");
-			ltl.setContextVar('c');
+			ltl.setOption("contextVar", 'c');
 			var code = ltl.compile('p').toString();
 			assert.equal(code, "function (c){var o='<p></p>';return o}");
 		});
 	});
-	describe('ltl.setPartsVar(string)', function () {
+	describe('ltl.setOption("partsVar", string)', function () {
 		it('should modify parts variable', function () {
-			ltl.setPartsVar('parts');
-			ltl.setPartsVar('p');
+			ltl.setOption("partsVar", 'parts');
+			ltl.setOption("partsVar", 'p');
+		});
+	});
+	describe('ltl.setOption("space", string)', function () {
+		it('should modify space variable', function () {
+			ltl.setOption('space', '\t');
+			var result = ltl.compile('.\n p hi')();
+			assert.equal(result, '<div>\n\t<p>hi</p>\n</div>');
+			delete ltl._options['space'];
 		});
 	});
 	describe('ltl.compile', function () {
