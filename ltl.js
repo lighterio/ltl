@@ -14,8 +14,8 @@
 	var commandPattern = /^(call|get|set)\b/;
 
 	// JavaScript tokens that don't need contextVar prepended for interpolation.
-	// TODO: Flesh out this list.
-	var jsPattern = /^(true|false|null|NaN|Infinity|Math|window)$/;
+	// TODO: Flesh out this list?
+	var jsPattern = /^(true|false|null|NaN|Infinity|window|location|Math|console)$/;
 
 	// Stores available single character variable names.
 	var varCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$';
@@ -47,7 +47,7 @@
 		version: '0.1.1',
 
 		// Store all of the templates that have been compiled.
-		_cache: {},
+		cache: {},
 
 		// Default compile options.
 		_options: {
@@ -657,7 +657,7 @@
 
 			// If there's a name specified, cache the template with that name.
 			if (options.name) {
-				this._cache[options.name] = template;
+				this.cache[options.name] = template;
 			}
 
 			return template;
