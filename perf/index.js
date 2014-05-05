@@ -54,10 +54,11 @@ var operations = [
 
 operations.forEach(function (operation) {
 	console.log('\n' + operation.name + ' x' + operation.count);
-	engines.forEach(function (engine) {
+	engines.forEach(function (engine, engineIndex) {
 
+		var count = operation.count;
 		started = new Date();
-		for (i = 0; i < operation.count; i++) {
+		for (i = 0; i < count; i++) {
 			if (operation.name == 'Compile') {
 				engine.template = engine.lib.compile(engine.code);
 			}
@@ -68,5 +69,5 @@ operations.forEach(function (operation) {
 		elapsed = new Date() - started;
 		console.log(engine.name + ': ' + elapsed);
 
-	})
+	});
 });

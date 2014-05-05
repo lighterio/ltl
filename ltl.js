@@ -114,6 +114,7 @@
 
 			var varIndex = 0;
 			var escapeVar = false;
+			var loopVars = [];
 
 			function appendText(textMode, text) {
 				if (textMode != mode) {
@@ -123,6 +124,9 @@
 						output += options.outputVar + "+='";
 					}
 					mode = textMode;
+				}
+				if (mode == 'html') {
+					text = interpolate(text);
 				}
 				output += text;
 			}
@@ -223,8 +227,11 @@
 							else if (tag == '-') {
 								appendText('html', '-->');
 							}
-							else if (tag == '{') {
+							else if (controlPattern.test(tag)) {
 								appendText('script', '}');
+								if (tag == 'for') {
+									loopVars.pop();
+								}
 							}
 							else if (!selfClosePattern.test(tag)) {
 								var html = '</' + tag + '>';
@@ -251,25 +258,30 @@
 						found = true;
 						var i = vars[varIndex++];
 						var l = vars[varIndex++];
-						return 'for(var ' + i + '=0,' + l + '=' + c + '.' + array + '.length;' +
+						var e = vars[varIndex++];
+						loopVars.push([[item, e]]);
+						return 'for(var ' + e + ',' + i + '=0,' + l + '=' + c + '.' + array + '.length;' +
 							i + '<' + l + ';++' + i + ')' +
-							'{' + c + '.' + item + '=' + c + '.' + array + '[' + i + ']' + ';';
+							'{' + e + '=' + c + '.' + array + '[' + i + ']' + ';';
 					});
 				if (found) {
+					stack.push('for');
 					return script;
 				}
 
 				script = script.replace(/^(for)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*,\s*([$a-zA-Z_][$a-zA-Z_0-9]*)\s+of\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
 					function(match, keyword, key, value, object) {
 						found = true;
-						var i = vars[varIndex++];
-						return 'for(var ' + i + ' in ' + c + '.' + object + ')' +
-							'{if(!' + c + '.' + object + '.hasOwnProperty(' + i + '))continue;' +
-							c + '.' + key + '=' + i + ';' +
-							c + '.' + value + '=' + c + '.' + object + '[' + i + ']' + ';';
+						var k = vars[varIndex++];
+						var v = vars[varIndex++];
+						loopVars.push([[key, k], [value, v]]);
+						return 'for(var ' + k + ' in ' + c + '.' + object + ')' +
+							'{if(!' + c + '.' + object + '.hasOwnProperty(' + k + '))continue;' +
+							v + '=' + c + '.' + object + '[' + k + ']' + ';';
 					});
 
 				if (found) {
+					stack.push('for');
 					return script;
 				}
 
@@ -279,6 +291,7 @@
 						return keyword + (condition ? '(' + contextify(condition) + ')' : '') + '{';
 					});
 
+				stack.push('if');
 				return script;
 			}
 
@@ -288,11 +301,20 @@
 			function contextify(code) {
 				var tokens = code.split(/\b/);
 				var isProperty = false;
+				var isLoopVar = false;
 				for (var i = 0; i < tokens.length; i++) {
 					var token = tokens[i];
 					if (/^[a-z_]/i.test(token)) {
 						if (!jsPattern.test(token)) {
-							if (!isProperty) {
+							for (var j = 0; j < loopVars.length; j++) {
+								for (var k = 0; k < loopVars[j].length; k++) {
+									if (token == loopVars[j][k][0]) {
+										isLoopVar = true;
+										tokens[i] = loopVars[j][k][1];
+									}
+								}
+							}
+							if (!isProperty && !isLoopVar) {
 								tokens[i] = options.contextVar + '.' + token;
 							}
 						}
@@ -379,7 +401,6 @@
 
 				// Control patterns such as if/else/for must transform into true JavaScript.
 				if (controlPattern.test(line)) {
-					stack.push('{');
 					var code = transformScript(line);
 					appendText('script', code);
 				}
@@ -617,12 +638,11 @@
 			}
 
 			// Create the function.
-			output = interpolate(output); // TODO: Break up to allow non-interpolated blocks?
 			if (escapeVar) {
 				output = "function " + escapeVar + "(t){" +
 					"var r={'<':'&lt;','&':'&amp;','>':'&gt;'};" +
 					"return (''+t).replace(/[<&>]/g,function(m){return r[m]})};" +
-					interpolate(output);
+					output;
 			}
 			output = 'eval.f=function(' + options.contextVar + (hasGets ? ',' + options.partsVar : '') + '){' + output + '}';
 			try {
