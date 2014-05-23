@@ -27,5 +27,13 @@ describe('Control', function () {
 			result = template({a: false, b: false});
 			assert.equal(result, '<i></i>');
 		});
+		it('should work with strings', function () {
+			var template = ltl.compile("if a == 'a'\n a\nelse\n i");
+			var result;
+			result = template({a: 'a'});
+			assert.equal(result, '<a></a>');
+			result = template({a: 'b', b: true});
+			assert.equal(result, '<i></i>');
+		});
 	});
 });

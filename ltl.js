@@ -44,7 +44,7 @@
 	var ltl = {
 
 		// Allow users to see what version of ltl they're using.
-		version: '0.1.2',
+		version: '0.1.3',
 
 		// Store all of the templates that have been compiled.
 		cache: {},
@@ -297,28 +297,36 @@
 
 			/**
 			 * Convert a JavaScripty expression to a scoped expression using contextVar.
+       * TODO: Actually parse JavaScript so that strings can't be interpreted as vars.
 			 */
 			function contextify(code) {
 				var tokens = code.split(/\b/);
 				var isProperty = false;
 				var isLoopVar = false;
+        var isInString = false;
 				for (var i = 0; i < tokens.length; i++) {
 					var token = tokens[i];
-					if (/^[a-z_]/i.test(token)) {
-						if (!jsPattern.test(token)) {
-							for (var j = 0; j < loopVars.length; j++) {
-								for (var k = 0; k < loopVars[j].length; k++) {
-									if (token == loopVars[j][k][0]) {
-										isLoopVar = true;
-										tokens[i] = loopVars[j][k][1];
-									}
-								}
-							}
-							if (!isProperty && !isLoopVar) {
-								tokens[i] = options.contextVar + '.' + token;
-							}
-						}
-					}
+          var stringTokens = token.match(/['"]/g);
+          if (stringTokens) {
+            isInString = ((isInString ? 1 : 0 ) + stringTokens.length) % 2;
+          }
+          if (!isInString) {
+  					if (/^[a-z_]/i.test(token)) {
+  						if (!jsPattern.test(token)) {
+  							for (var j = 0; j < loopVars.length; j++) {
+  								for (var k = 0; k < loopVars[j].length; k++) {
+  									if (token == loopVars[j][k][0]) {
+  										isLoopVar = true;
+  										tokens[i] = loopVars[j][k][1];
+  									}
+  								}
+  							}
+  							if (!isProperty && !isLoopVar) {
+  								tokens[i] = options.contextVar + '.' + token;
+  							}
+  						}
+  					}
+          }
 					isProperty = token[token.length - 1] == '.';
 				}
 				return tokens.join('');
