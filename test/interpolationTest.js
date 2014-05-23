@@ -9,7 +9,7 @@ describe('Interpolation', function () {
 	});
 	it('should support html-escaped output', function () {
 		var result = ltl.compile('p ${text}')({text: '<&>'});
-		assert.equal(result, '<p>&lt;&amp;&gt;</p>');
+		assert.equal(result, '<p>&lt;&></p>');
 	});
 	it('should support raw output', function () {
 		var result = ltl.compile('p ={text}')({text: '<&>'});
@@ -17,7 +17,7 @@ describe('Interpolation', function () {
 	});
 	it('should work in a block', function () {
 		var result = ltl.compile('p:\n ${text}')({text: 'Should be <escaped>.'});
-		assert.equal(result, '<p>Should be &lt;escaped&gt;.</p>');
+		assert.equal(result, '<p>Should be &lt;escaped>.</p>');
 		var result = ltl.compile('p:\n ={text}')({text: 'Should be <unescaped>.'});
 		assert.equal(result, '<p>Should be <unescaped>.</p>');
 	});
