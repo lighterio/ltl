@@ -3,31 +3,31 @@ var dot = require('dot');
 var ltl = require('../ltl');
 
 var ltlCode =
-	'html\n' +
-	' head\n' +
-	'  title Hello World\n' +
-	' body\n' +
-	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: ={message}\n' +
-	'  ul\n' +
-	'   for item in items\n' +
-	'    li ={item}\n';
+  'html\n' +
+  ' head\n' +
+  '  title Hello World\n' +
+  ' body\n' +
+  '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: ={message}\n' +
+  '  ul\n' +
+  '   for item in items\n' +
+  '    li ={item}\n';
 
 var jadeCode =
-	'doctype html\n' +
-	'html\n' +
-	' head\n' +
-	'  title Hello World\n' +
-	' body\n' +
-	'  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
-	'  ul\n' +
-	'   each item in items\n' +
-	'    li #{item}\n';
+  'doctype html\n' +
+  'html\n' +
+  ' head\n' +
+  '  title Hello World\n' +
+  ' body\n' +
+  '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
+  '  ul\n' +
+  '   each item in items\n' +
+  '    li #{item}\n';
 
 var dotCode = '<!DOCTYPE html><html><head><title>Hello World</title></head>' +
-	'<body><div id="hey" class="a b" style="display:block;width:100px">' +
-	'Here\'s my message: {{=it.message}}</div><ul>{{' +
-	'for(var i=0;i<it.items.length;++i){it.item=it.items[i]; }}' +
-	'<li>{{=it.item}}</li>{{ } }}</ul></body></html>';
+  '<body><div id="hey" class="a b" style="display:block;width:100px">' +
+  'Here\'s my message: {{=it.message}}</div><ul>{{' +
+  'for(var i=0;i<it.items.length;++i){it.item=it.items[i]; }}' +
+  '<li>{{=it.item}}</li>{{ } }}</ul></body></html>';
 
 var context = {message: 'hello', items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']};
 
@@ -42,32 +42,32 @@ console.log('');
 var i, started, elapsed, result;
 
 var engines = [
-	{name: 'Jade', code: jadeCode, lib: jade},
-	{name: 'doT', code: dotCode, lib: dot},
-	{name: 'ltl', code: ltlCode, lib: ltl}
+  {name: 'Jade', code: jadeCode, lib: jade},
+  {name: 'doT', code: dotCode, lib: dot},
+  {name: 'ltl', code: ltlCode, lib: ltl}
 ];
 
 var operations = [
-	{name: 'Compile', count: 1e3},
-	{name: 'Render', count: 1e6}
+  {name: 'Compile', count: 1e3},
+  {name: 'Render', count: 1e6}
 ];
 
 operations.forEach(function (operation) {
-	console.log('\n' + operation.name + ' x' + operation.count);
-	engines.forEach(function (engine, engineIndex) {
+  console.log('\n' + operation.name + ' x' + operation.count);
+  engines.forEach(function (engine, engineIndex) {
 
-		var count = operation.count;
-		started = new Date();
-		for (i = 0; i < count; i++) {
-			if (operation.name == 'Compile') {
-				engine.template = engine.lib.compile(engine.code);
-			}
-			else {
-				result = engine.template(context);
-			}
-		}
-		elapsed = new Date() - started;
-		console.log(engine.name + ': ' + elapsed);
+    var count = operation.count;
+    started = new Date();
+    for (i = 0; i < count; i++) {
+      if (operation.name == 'Compile') {
+        engine.template = engine.lib.compile(engine.code);
+      }
+      else {
+        result = engine.template(context);
+      }
+    }
+    elapsed = new Date() - started;
+    console.log(engine.name + ': ' + elapsed);
 
-	});
+  });
 });

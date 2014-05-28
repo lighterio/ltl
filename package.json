@@ -11,7 +11,7 @@
     "jade",
     "dot"
   ],
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "ltl",
   "homepage": "http://lighter.io/ltl",
   "repository": "git://github.com/zerious/ltl.git",
@@ -34,14 +34,14 @@
   "dependencies": {},
   "devDependencies": {
     "assert-plus": "0.1.5",
-    "mocha": "1.18.2",
-    "istanbul": "0.2.9",
+    "mocha": "1.20.0",
+    "istanbul": "0.2.10",
     "coveralls": "2.10.0",
     "dot": "1.0.2",
     "jade": "1.3.1",
     "markdown": "0.5.0",
     "coffee-script": "1.7.1",
-    "zeriousify": "0.1.3"
+    "zeriousify": "0.1.5"
   },
   "bugs": {
     "url": "http://github.com/zerious/ltl/issues"
