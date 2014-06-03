@@ -44,7 +44,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.5',
+    version: '0.1.6',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -421,7 +421,7 @@
           pair = blockName.split(':');
           blockName = pair[0];
           if (command == 'get') {
-            appendText('html', "'+" + options.partsVar + "['" + blockName + "'](" + options.contextVar + ")+'");
+            appendText('html', "'+" + options.partsVar + "['" + blockName + "'].call(this," + options.contextVar + ")+'");
             hasGets = true;
           }
           else {
