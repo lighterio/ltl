@@ -44,7 +44,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.6',
+    version: '0.1.7',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -310,7 +310,7 @@
           if (stringTokens) {
             isInString = ((isInString ? 1 : 0 ) + stringTokens.length) % 2;
           }
-          if (!isInString) {
+          else if (!isInString) {
             if (/^[a-z_]/i.test(token)) {
               if (!jsPattern.test(token)) {
                 for (var j = 0; j < loopVars.length; j++) {
@@ -326,8 +326,9 @@
                 }
               }
             }
+            isProperty = token[token.length - 1] == '.';
+            isLoopVar = false;
           }
-          isProperty = token[token.length - 1] == '.';
         }
         return tokens.join('');
       }

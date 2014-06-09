@@ -11,7 +11,7 @@
     "jade",
     "dot"
   ],
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "ltl",
   "homepage": "http://lighter.io/ltl",
   "repository": "git://github.com/zerious/ltl.git",
@@ -34,7 +34,7 @@
   "dependencies": {},
   "devDependencies": {
     "assert-plus": "0.1.5",
-    "mocha": "1.20.0",
+    "mocha": "1.20.1",
     "istanbul": "0.2.10",
     "coveralls": "2.10.0",
     "dot": "1.0.2",
