@@ -32,6 +32,7 @@ var result = template({name: 'World'});
  * `code` is a string of ltl code.
  * `options` is an object with any of the following properties:
   * `name` will cause the template to cache at `ltl.templates[name]`
+  * `space` causes HTML to be indented, using `space` as indentation.
 
 ### ltl.setOption(name, value)
  * `name` is the name of a compiler option.

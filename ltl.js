@@ -4,6 +4,8 @@
 
 (function () {
 
+  var isBrowser = (typeof window == 'object');
+
   // Some HTML tags won't have end tags.
   var selfClosePattern = /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/)(\b|$)/;
 
@@ -40,21 +42,44 @@
     return escapeSingleQuotes(text).replace(/\n/g, '\\n');
   }
 
+  // When compilation fails, we can re-run in debug mode.
+  function debug(output, settings) {
+    var fs = require('fs');
+    var dir = process.cwd() + '/.debug';
+    var name = (settings.name || 'template').replace(/[\/\\]/g, '__');
+    try {
+      fs.mkdirSync(dir);
+    }
+    catch (e) {
+      // Probably already exists.
+    }
+    fs.writeFileSync(dir + '/' + name + '.js', 'module.exports=' + output);
+    try {
+      require(dir + '/' + name);
+    }
+    catch (e) {
+      name = (settings.name ? '"' + settings.name + '"' : 'template');
+      e.message = 'Ltl failed to compile ' + name + '. ' + e.message;
+      throw e;
+    }
+  }
+
   // Public API.
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.7',
+    version: '0.1.8',
 
     // Store all of the templates that have been compiled.
     cache: {},
 
-    // Default compile options.
+    // Default compile settings.
     _options: {
       tabWidth: 4,
       outputVar: 'o',
       contextVar: 'c',
-      partsVar: 'p'
+      partsVar: 'p',
+      enableDebug: false
     },
 
     // Change compile options.
@@ -65,22 +90,27 @@
     // Create a function that accepts context and returns markup.
     compile: function (code, options) {
 
-      // Copy default options.
-      options = options || {};
-      for (var name in this._options) {
-        if (typeof options[name] == 'undefined') {
-          options[name] = this._options[name];
-        }
+      // Copy the default options.
+      var settings = {
+        tabWidth: this._options.tabWidth,
+        outputVar: this._options.outputVar,
+        contextVar: this._options.contextVar,
+        partsVar: this._options.partsVar,
+        space: this._options.space,
+        enableDebug: this._options.enableDebug
+      };
+      for (var name in options) {
+        settings[name] = options[name];
       }
 
       // Don't allow context/output/parts vars to become user vars.
       var vars = varCharacters;
-      vars = vars.replace(options.contextVar, '');
-      vars = vars.replace(options.outputVar, '');
-      vars = vars.replace(options.partsVar, '');
+      vars = vars.replace(settings.contextVar, '');
+      vars = vars.replace(settings.outputVar, '');
+      vars = vars.replace(settings.partsVar, '');
 
-      if (options.space) {
-        options.space = escapeBlock(options.space);
+      if (settings.space) {
+        settings.space = escapeBlock(settings.space);
       }
 
       // Find out if we're in the browser.
@@ -95,7 +125,7 @@
       code = code.replace(/\r/g, '');
 
       // Be lenient with mixed tabs and spaces, assuming tab width of 4.
-      var tabReplacement = Array(options.tabWidth + 1).join(' ');
+      var tabReplacement = Array(settings.tabWidth + 1).join(' ');
       code = code.replace(/\t/g, tabReplacement);
 
       // We'll auto-detect tab width.
@@ -110,7 +140,7 @@
       var previousTag;
       var hasHtmlOutput = false;
       var tagDepth = 0;
-      var output = 'var ' + options.outputVar + "='";
+      var output = 'var ' + settings.outputVar + "='";
 
       var varIndex = 0;
       var escapeVar = false;
@@ -121,7 +151,7 @@
           if (mode == 'html') {
             output += "'" + (text == '}' ? '' : ';');
           } else {
-            output += options.outputVar + "+='";
+            output += settings.outputVar + "+='";
           }
           mode = textMode;
         }
@@ -143,16 +173,27 @@
         // Reset the blockage.
         blockIndent = 0;
 
+        // Some options should be passed through.
+        var blockOptions = {
+          outputVar: settings.outputVar,
+          contextVar: settings.contextVar,
+          partsVar: settings.partsVar,
+          space: settings.space,
+          enableDebug: settings.enableDebug
+        };
+
         // If we're in a "call" block, compile the contents.
         if (blockFilter == 'call') {
-          appendText('html', "'+this['" + blockName + "'].call(this," + options.contextVar + (text ? ',' + ltl.compile(text) : '') + ")+'");
+          appendText('html',
+            "'+this['" + blockName + "'].call(this," + settings.contextVar +
+            (text ? ',' + ltl.compile(text, blockOptions) : '') + ")+'");
           return;
         }
         // For a "set" block.
         else if (blockFilter == 'set' || blockFilter == 'set:') {
           var block;
           if (blockFilter == 'set') {
-            block = ltl.compile(text).toString();
+            block = ltl.compile(text, blockOptions).toString();
           } else {
             block = "function(){return '" + escapeBlock(text) + "'}";
           }
@@ -198,13 +239,13 @@
         }
 
         text = trim(text);
-        if (options.space) {
+        if (settings.space) {
           if (hasHtmlOutput) {
             text = '\n' + text;
           }
-          text = text.replace(/\n/g, '\n' + repeat(options.space, tagDepth));
+          text = text.replace(/\n/g, '\n' + repeat(settings.space, tagDepth));
           if (blockTag) {
-            text += '\n' + repeat(options.space, tagDepth - 1);
+            text += '\n' + repeat(settings.space, tagDepth - 1);
           }
         }
 
@@ -239,8 +280,8 @@
                 if (tag == previousTag) {
                   previousTag = null;
                 }
-                else if (options.space) {
-                  html = '\\n' + repeat(options.space, tagDepth) + html;
+                else if (settings.space) {
+                  html = '\\n' + repeat(settings.space, tagDepth) + html;
                 }
                 appendText('html', html);
               }
@@ -250,7 +291,7 @@
       }
 
       function transformScript(script) {
-        var c = options.contextVar;
+        var c = settings.contextVar;
         var found = false;
 
         script = script.replace(/^(for)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s+in\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
@@ -322,7 +363,7 @@
                   }
                 }
                 if (!isProperty && !isLoopVar) {
-                  tokens[i] = options.contextVar + '.' + token;
+                  tokens[i] = settings.contextVar + '.' + token;
                 }
               }
             }
@@ -367,7 +408,14 @@
       // Iterate over each line.
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
+
+        // Mitigate recursion past 100 deep.
         var maxT = 1e2;
+
+        // In debug mode, make JS line numbers match Ltl line numbers.
+        if (settings.enableDebug && i) {
+          output += mode == 'html' ? "' +\n'" : '\n';
+        }
 
         // If the line is all whitespace, ignore it.
         if (!/\S/.test(line)) {
@@ -377,13 +425,18 @@
         // Find the number of leading spaces.
         var spaces = line.search(/[^ ]/);
 
+        // In debug mode, make indentation match.
+        if (settings.enableDebug) {
+          output += line.substr(0, spaces);
+        }
+
         // If this is our first time seeing leading spaces, that's our tab width.
         if (spaces > 0 && !currentTabWidth) {
           currentTabWidth = spaces;
         }
 
         // Calculate the number of levels of indentation.
-        var indent = spaces ? Math.round(spaces / currentTabWidth) : 0;
+        indent = spaces ? Math.round(spaces / currentTabWidth) : 0;
 
         // If we're in a block, we can append or close it.
         if (blockIndent) {
@@ -410,8 +463,8 @@
 
         // Control patterns such as if/else/for must transform into true JavaScript.
         if (controlPattern.test(line)) {
-          var code = transformScript(line);
-          appendText('script', code);
+          var script = transformScript(line);
+          appendText('script', script);
         }
 
         // Expression patterns make things append.
@@ -422,7 +475,7 @@
           pair = blockName.split(':');
           blockName = pair[0];
           if (command == 'get') {
-            appendText('html', "'+" + options.partsVar + "['" + blockName + "'].call(this," + options.contextVar + ")+'");
+            appendText('html', "'+" + settings.partsVar + "['" + blockName + "'].call(this," + settings.contextVar + ")+'");
             hasGets = true;
           }
           else {
@@ -587,12 +640,12 @@
 
               html = escapeSingleQuotes(html);
               if (tag == 'html' && !/DOCTYPE/.test(output)) {
-                html = '<!DOCTYPE html>' + (options.space ? '\\n' : '') + html;
+                html = '<!DOCTYPE html>' + (settings.space ? '\\n' : '') + html;
               }
 
-              // Prepend whitespace if requested via options.space.
-              if (options.space) {
-                html = repeat(options.space, tagDepth) + html;
+              // Prepend whitespace if requested via settings.space.
+              if (settings.space) {
+                html = repeat(settings.space, tagDepth) + html;
                 // Prepend a line break if this isn't the first tag.
                 if (hasHtmlOutput) {
                   html = '\\n' + html;
@@ -616,7 +669,7 @@
                 stack[indent] = tag;
               }
 
-              // Allow same-line tag open/close in options.space mode.
+              // Allow same-line tag open/close in settings.space mode.
               previousTag = tag;
               if (!selfClosePattern.test(tag)) {
                 tagDepth++;
@@ -640,7 +693,7 @@
       backtrackIndent();
 
       // Add the return statement (ending concatenation, where applicable).
-      appendText('script', 'return ' + options.outputVar);
+      appendText('script', 'return ' + settings.outputVar);
 
       if (blockSets.length) {
         return '{' + blockSets.join(',') + '}';
@@ -650,31 +703,40 @@
       if (escapeVar) {
         output = "function " + escapeVar + "(t){return (''+t).replace(/</g,'&lt;')};" + output;
       }
-      output = 'eval.f=function(' + options.contextVar + (hasGets ? ',' + options.partsVar : '') + '){' + output + '}';
+      output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
+
+      // Evaluate the template as a function.
       try {
-        eval(output);
+        eval('eval.f=' + output); // jshint ignore:line
       }
       catch (e) {
-        // Anyone hitting an error here should submit an issue on GitHub.
-        /* istanbul ignore next */
-        throw "Could not save output as a function: " + output;
+        // If we failed in a dev environment in Node, we can try to debug it.
+        if (process && settings.enableDebug) {
+          debug(output, settings);
+        }
+        // Otherwise, just fail.
+        else {
+          var name = (settings.name ? '"' + settings.name + '"' : 'template');
+          e.message = 'Ltl failed to compile ' + name + '. ' + e.message;
+          throw e;
+        }
       }
       var template = eval.f;
 
       // If there's a name specified, cache the template with that name.
-      if (options.name) {
-        this.cache[options.name] = template;
+      if (settings.name) {
+        this.cache[settings.name] = template;
       }
 
       return template;
     }
   };
 
-  if (typeof window == 'undefined') {
-    module.exports = ltl;
+  if (isBrowser) {
+    window.ltl = ltl;
   }
   else {
-    window.ltl = ltl;
+    module.exports = ltl;
   }
 
 })();

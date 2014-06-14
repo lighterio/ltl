@@ -9,6 +9,7 @@
 .project
 .DS_Store
 .cache
+.debug
 .gitignore
 pids
 logs
