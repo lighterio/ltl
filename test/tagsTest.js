@@ -49,6 +49,10 @@ describe('Tags', function () {
       var result = ltl.compile('i#save.icon')();
       assert.equal(result, '<i id="save" class="icon"></i>');
     });
+    it('should work with a class before an id', function () {
+      var result = ltl.compile('i.icon#save')();
+      assert.equal(result, '<i id="save" class="icon"></i>');
+    });
   });
   describe('attributes', function () {
     it('should end attributes when they\'re unclosed', function () {

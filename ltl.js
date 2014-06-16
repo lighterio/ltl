@@ -59,7 +59,7 @@
     }
     catch (e) {
       name = (settings.name ? '"' + settings.name + '"' : 'template');
-      e.message = 'Ltl failed to compile ' + name + '. ' + e.message;
+      e.message = '[Ltl] Failed to compile ' + name + '. ' + e.message;
       throw e;
     }
   }
@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.8',
+    version: '0.1.9',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -101,6 +101,9 @@
       };
       for (var name in options) {
         settings[name] = options[name];
+      }
+      if (settings.enableDebug && !settings.space) {
+        settings.space = '  ';
       }
 
       // Don't allow context/output/parts vars to become user vars.
@@ -412,11 +415,6 @@
         // Mitigate recursion past 100 deep.
         var maxT = 1e2;
 
-        // In debug mode, make JS line numbers match Ltl line numbers.
-        if (settings.enableDebug && i) {
-          output += mode == 'html' ? "' +\n'" : '\n';
-        }
-
         // If the line is all whitespace, ignore it.
         if (!/\S/.test(line)) {
           continue;
@@ -424,11 +422,6 @@
 
         // Find the number of leading spaces.
         var spaces = line.search(/[^ ]/);
-
-        // In debug mode, make indentation match.
-        if (settings.enableDebug) {
-          output += line.substr(0, spaces);
-        }
 
         // If this is our first time seeing leading spaces, that's our tab width.
         if (spaces > 0 && !currentTabWidth) {
@@ -495,7 +488,7 @@
           while (rest && (++t < maxT)) {
             var tag = '';
             var id = '';
-            var className = '';
+            var classes = [];
             var attributes = '';
             var content = '';
             var character = '';
@@ -508,14 +501,14 @@
               // If it's an ID, read up to the next thing, and save the ID.
               if (character == '#') {
                 end = rest.search(/([\.\(>:\s]|$)/);
-                id = rest.substring(1, end);
+                id = id || rest.substring(1, end);
                 rest = rest.substring(end);
               }
 
-              // If it's a class, read up to the next thing, and save the className.
+              // If it's a class, read up to the next thing, and save the class.
               else if (character == '.') {
-                end = rest.search(/([\(>:\s]|$)/);
-                className = rest.substring(1, end).replace(/\./g, ' ');
+                end = rest.search(/([#\(>:\s]|$)/);
+                classes.push(rest.substring(1, end).replace(/\./g, ' '));
                 rest = rest.substring(end);
               }
 
@@ -604,6 +597,8 @@
             }
             // If it's not a comment, we'll add some HTML.
             else {
+              var className = classes.join(' ');
+
               // Default to a <div> unless we're in a tagless block.
               if (!tag) {
                 var useDefault = (blockTag === null) || id || className || attributes;
@@ -678,7 +673,7 @@
 
             tag = '';
             id = '';
-            className = '';
+            classes = [];
             attributes = '';
             content = '';
           }
@@ -717,7 +712,7 @@
         // Otherwise, just fail.
         else {
           var name = (settings.name ? '"' + settings.name + '"' : 'template');
-          e.message = 'Ltl failed to compile ' + name + '. ' + e.message;
+          e.message = '[Ltl] Failed to compile ' + name + '. ' + e.message;
           throw e;
         }
       }
