@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.9',
+    version: '0.1.10',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -696,7 +696,7 @@
 
       // Create the function.
       if (escapeVar) {
-        output = "function " + escapeVar + "(t){return (''+t).replace(/</g,'&lt;')};" + output;
+        output = "function " + escapeVar + "(t){return (typeof t=='undefined'?'':''+t).replace(/</g,'&lt;')};" + output;
       }
       output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
 
