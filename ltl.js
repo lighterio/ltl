@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.10',
+    version: '0.1.11',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -592,7 +592,8 @@
             }
 
             // If it's a comment, set a boolean so we can ignore its contents.
-            if (tag == '//') {
+            if (tag.indexOf('//') === 0) {
+              tag = '//';
               inComment = true;
             }
             // If it's not a comment, we'll add some HTML.

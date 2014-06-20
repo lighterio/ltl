@@ -5,11 +5,15 @@ describe('Ltl comments', function () {
   it('should be omitted', function () {
     var result = ltl.compile('// Comment')();
     assert.equal(result, '');
-    var result = ltl.compile('p before\n// Comment\np after')();
+    result = ltl.compile('p before\n// Comment\np after')();
     assert.equal(result, '<p>before</p><p>after</p>');
   });
   it('should be omitted as a block', function () {
     var result = ltl.compile('//\n Comment')();
+    assert.equal(result, '');
+  });
+  it('should work without a space', function () {
+    var result = ltl.compile('//Comment')();
     assert.equal(result, '');
   });
   it('should be omitted as a block with indentation', function () {
