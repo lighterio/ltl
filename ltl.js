@@ -697,7 +697,7 @@
 
       // Create the function.
       if (escapeVar) {
-        output = "function " + escapeVar + "(t){return (typeof t=='undefined'?'':''+t).replace(/</g,'&lt;')};" + output;
+        output = "function " + escapeVar + "(t){return (t==null?'':''+t).replace(/</g,'&lt;')};" + output;
       }
       output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
 
