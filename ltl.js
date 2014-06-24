@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.11',
+    version: '0.1.12',
 
     // Store all of the templates that have been compiled.
     cache: {},
