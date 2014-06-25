@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.12',
+    version: '0.1.13',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -146,7 +146,8 @@
       var output = 'var ' + settings.outputVar + "='";
 
       var varIndex = 0;
-      var escapeVar = false;
+      var escapeHtmlVar = false;
+      var encodeUriVar = false;
       var loopVars = [];
 
       function appendText(textMode, text) {
@@ -378,18 +379,24 @@
       }
 
       /**
-       * Find ${...} and ={...} and turn them into contextified insertions unless escaped.
+       * Find ${...}, &{...} and ={...} and turn them into contextified insertions unless escaped.
        */
       function interpolate(code) {
-        return code.replace(/(\\?)([$=])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
+        return code.replace(/(\\?)([$=&])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
           if (backslash) {
             return symbol + '{' + expression + '}';
           }
           if (symbol == '$') {
-            if (!escapeVar) {
-              escapeVar = vars[varIndex++];
+            if (!escapeHtmlVar) {
+              escapeHtmlVar = vars[varIndex++];
             }
-            return "'+" + escapeVar + '(' + contextify(expression) + ")+'";
+            return "'+" + escapeHtmlVar + '(' + contextify(expression) + ")+'";
+          }
+          else if (symbol == '&') {
+            if (!encodeUriVar) {
+              encodeUriVar = vars[varIndex++];
+            }
+            return "'+" + encodeUriVar + '(' + contextify(expression) + ")+'";
           }
           else {
             return "'+" + contextify(expression) + "+'";
@@ -696,8 +703,11 @@
       }
 
       // Create the function.
-      if (escapeVar) {
-        output = "function " + escapeVar + "(t){return (t==null?'':''+t).replace(/</g,'&lt;')};" + output;
+      if (escapeHtmlVar) {
+        output = "function " + escapeHtmlVar + "(t){return (t==null?'':''+t).replace(/</g,'&lt;')};" + output;
+      }
+      if (encodeUriVar) {
+        output = "function " + encodeUriVar + "(t){return (encodeURIComponent||escape)(t==null?'':''+t)};" + output;
       }
       output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
 

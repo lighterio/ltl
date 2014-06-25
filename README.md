@@ -196,7 +196,17 @@ template({name: 'Sam'});
 <div>Hello Sam!</div>
 ```
 
-If you'd like your content to skip HTML encoding (because
+To encode for a URL rather than HTML, use `&{}`.
+
+Context: `{query: "good brewpubs"}`
+```jade
+a(href="?q=&{query}")
+```
+```html
+<a href="?q=good%20brewpubs">good brewpubs</a>
+```
+
+If you'd like your content to skip encoding (because
 you want your expression to output raw HTML tags rather
 than safely escaped text), use `={..}`.
 
@@ -208,7 +218,7 @@ Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 <div><script>alert('Gotcha!')</script></div>
 ```
 
-If you want to show `${..}` or `={..}` blocks in your output,
+If you want to show `${..}`, `&{..}` or `={..}` blocks in your output,
 you can escape with a backslash.
 ```jade
 code \${escaped} or \={raw}

@@ -11,6 +11,10 @@ describe('Interpolation', function () {
     var result = ltl.compile('p ${text}')({text: '<&>'});
     assert.equal(result, '<p>&lt;&></p>');
   });
+  it('should support uri-encoded output', function () {
+    var result = ltl.compile('a(href="?q=&{query}") ${query}\np &{query}')({query: 'ltl templates'});
+    assert.equal(result, '<a href="?q=ltl%20templates">ltl templates</a><p>ltl%20templates</p>');
+  });
   it('should support raw output', function () {
     var result = ltl.compile('p ={text}')({text: '<&>'});
     assert.equal(result, '<p><&></p>');
@@ -18,7 +22,7 @@ describe('Interpolation', function () {
   it('should work in a block', function () {
     var result = ltl.compile('p:\n ${text}')({text: 'Should be <escaped>.'});
     assert.equal(result, '<p>Should be &lt;escaped>.</p>');
-    var result = ltl.compile('p:\n ={text}')({text: 'Should be <unescaped>.'});
+    result = ltl.compile('p:\n ={text}')({text: 'Should be <unescaped>.'});
     assert.equal(result, '<p>Should be <unescaped>.</p>');
   });
   it('should be escapable', function () {
