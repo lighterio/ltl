@@ -32,6 +32,9 @@ var dotCode = '<!DOCTYPE html><html><head><title>Hello World</title></head>' +
 var context = {message: 'hello', items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']};
 
 console.log('');
+console.log('Jade:');
+console.log(jade.compile(jadeCode).toString());
+console.log('');
 console.log('doT:');
 console.log(dot.compile(dotCode).toString());
 console.log('');

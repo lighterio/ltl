@@ -13,17 +13,17 @@ describe('API', function () {
     it('should expose version', function () {
       assert.ok(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
       var pkg = require('../package.json');
-      assert.equal(pkg.version, ltl.version);
+      is(pkg.version, ltl.version);
     });
   });
   describe('ltl.setOption("tabWidth", int)', function () {
     it('should modify tab/space leniency', function () {
       ltl.setOption("tabWidth", 1);
       var result = ltl.compile('ul\n li\n\tli')();
-      assert.equal(result, '<ul><li></li><li></li></ul>');
+      is(result, '<ul><li></li><li></li></ul>');
       ltl.setOption("tabWidth", 2);
-      var result = ltl.compile('ul\n li\n\tli')();
-      assert.equal(result, '<ul><li><li></li></li></ul>');
+      result = ltl.compile('ul\n li\n\tli')();
+      is(result, '<ul><li><li></li></li></ul>');
       ltl.setOption("tabWidth", 4);
     });
   });
@@ -31,24 +31,24 @@ describe('API', function () {
     it('should modify output variable', function () {
       ltl.setOption("outputVar", 'html');
       var code = ltl.compile('p').toString();
-      assert.equal(code, "function (c){var html='<p></p>';return html}");
+      is(code, "function (c){var html='<p></p>';return html}");
       ltl.setOption("outputVar", 'o');
-      var code = ltl.compile('p').toString();
-      assert.equal(code, "function (c){var o='<p></p>';return o}");
+      code = ltl.compile('p').toString();
+      is(code, "function (c){var o='<p></p>';return o}");
     });
     it('should override output variable', function () {
       var code = ltl.compile('p', {outputVar: 'out'}).toString();
-      assert.equal(code, "function (c){var out='<p></p>';return out}");
+      is(code, "function (c){var out='<p></p>';return out}");
     });
   });
   describe('ltl.setOption("contextVar", string)', function () {
     it('should modify context variable', function () {
       ltl.setOption("contextVar", 'context');
       var code = ltl.compile('p').toString();
-      assert.equal(code, "function (context){var o='<p></p>';return o}");
+      is(code, "function (context){var o='<p></p>';return o}");
       ltl.setOption("contextVar", 'c');
-      var code = ltl.compile('p').toString();
-      assert.equal(code, "function (c){var o='<p></p>';return o}");
+      code = ltl.compile('p').toString();
+      is(code, "function (c){var o='<p></p>';return o}");
     });
   });
   describe('ltl.setOption("partsVar", string)', function () {
@@ -61,8 +61,8 @@ describe('API', function () {
     it('should modify space variable', function () {
       ltl.setOption('space', '\t');
       var result = ltl.compile('.\n p hi')();
-      assert.equal(result, '<div>\n\t<p>hi</p>\n</div>');
-      delete ltl._options['space'];
+      is(result, '<div>\n\t<p>hi</p>\n</div>');
+      delete ltl._options.space;
     });
   });
   describe('ltl.compile', function () {
@@ -90,7 +90,7 @@ describe('API', function () {
         delete require.cache[key];
       }
       var pkg = require('../package.json');
-      assert.equal(pkg.version, window.ltl.version);
+      is(pkg.version, window.ltl.version);
     });
   });
 });
