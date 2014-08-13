@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Interpolation', function () {
   it('should not contextify Math', function () {

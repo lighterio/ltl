@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Debug', function () {
   it('should add whitespace to html', function () {

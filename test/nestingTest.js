@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Nesting', function () {
   describe('Two children', function () {
@@ -64,4 +63,3 @@ describe('Nesting', function () {
     });
   });
 });
-  

@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 var PBI = '<p><b><i></i></b></p>';
 var PBIT = '<p><b><i>text</i></b></p>';

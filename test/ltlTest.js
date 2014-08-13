@@ -1,17 +1,16 @@
 var ltl = require('../ltl');
-var assert = require('assert-plus');
 
 require('zeriousify').test();
 
 describe('API', function () {
   describe('ltl', function () {
     it('should be an object', function () {
-      assert.object(ltl);
+      is.object(ltl);
     });
   });
   describe('ltl.version', function () {
     it('should expose version', function () {
-      assert.ok(/^[0-9]+\.[0-9]+\.[0-9]+$/.test(ltl.version));
+      is.in(/^[0-9]+\.[0-9]+\.[0-9]+$/, ltl.version);
       var pkg = require('../package.json');
       is(pkg.version, ltl.version);
     });
@@ -67,12 +66,12 @@ describe('API', function () {
   });
   describe('ltl.compile', function () {
     it('should be a function', function () {
-      assert.func(ltl.compile);
+      is.function(ltl.compile);
     });
   });
   describe('ltl.compile(string)', function () {
     it('should return a function', function () {
-      assert.func(ltl.compile(''));
+      is.function(ltl.compile(''));
     });
   });
   describe('module', function () {

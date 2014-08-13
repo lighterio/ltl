@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Ltl comments', function () {
   it('should be omitted', function () {

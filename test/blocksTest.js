@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Blocks', function () {
   it('should work in the middle', function () {
@@ -12,8 +11,7 @@ describe('Blocks', function () {
   });
   it('should work with markdown', function () {
     var result = ltl.compile('p:md\n Heading\n =====')();
-    var hasHeading = /<h1>Heading<\/h1>/.test(result);
-    assert(hasHeading);
+    is.in(/<h1>Heading<\/h1>/, result);
   });
   it('should work without a tag', function () {
     var result = ltl.compile(':markdown\n # Heading')();
@@ -21,17 +19,13 @@ describe('Blocks', function () {
   });
   it('should work with CoffeeScript', function () {
     var result = ltl.compile('script:coffee\n a = 1')();
-    var hasVar = /var/.test(result);
-    assert(hasVar);
+    is.in(/var/, result);
   });
   it('should unwrap CoffeeScript with NOWRAP', function () {
     var result = ltl.compile('script:coffee\n # NOWRAP\n a = 1')();
-    var hasVar = /var/.test(result);
-    assert(hasVar);
-    var hasFunction = /function/.test(result);
-    assert(!hasFunction);
-    var hasCall = /call/.test(result);
-    assert(!hasCall);
+    is.in(/var/, result);
+    is.notIn(/function/, result);
+    is.notIn(/call/, result);
   });
   it('should work with text with line breaks', function () {
     var result = ltl.compile('p:\n First line.\n Second line.')();
@@ -64,7 +58,7 @@ describe('Blocks', function () {
     catch (e) {
       error = e;
     }
-    assert(error);
+    is.truthy(error);
   });
   it('should allow filterless blocks', function () {
     var result = ltl.compile('p:\n a\n b')();

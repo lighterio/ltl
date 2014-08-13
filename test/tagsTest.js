@@ -1,5 +1,4 @@
 var ltl = require('../ltl');
-var assert = require('assert');
 
 describe('Tags', function () {
   describe('<div> assumption', function () {

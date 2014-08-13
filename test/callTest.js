@@ -1,13 +1,12 @@
 var ltl = require('../ltl');
-var assert = require('assert-plus');
 
 describe('Call', function () {
   it('should have a cache object', function () {
-    assert.object(ltl.cache);
+    is.object(ltl.cache);
   });
   it('should put templates in the cache', function () {
     ltl.compile('b ${text}', {name: 'bold'});
-    assert.func(ltl.cache.bold);
+    is.function(ltl.cache.bold);
   });
   it('should call a template from the middle of another template', function () {
     ltl.compile('p\n call common', {name: 'temp'});

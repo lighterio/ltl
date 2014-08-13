@@ -1,10 +1,10 @@
 # Ltl
 
  [![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
- [![Build Status](https://travis-ci.org/zerious/ltl.png?branch=master)](https://travis-ci.org/zerious/ltl)
- [![Code Coverage](https://coveralls.io/repos/zerious/ltl/badge.png?branch=master)](https://coveralls.io/r/zerious/ltl)
- [![Dependencies](https://david-dm.org/zerious/ltl.png?theme=shields.io)](https://david-dm.org/zerious/ltl)
- [![Support](http://img.shields.io/gittip/zerious.png)](https://www.gittip.com/zerious/)
+ [![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
+ [![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
+ [![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
+ [![Support](http://img.shields.io/gittip/zerious.png)](https://www.gittip.com/lighterio/)
 
 The Ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
@@ -303,7 +303,7 @@ ltl.cache.page();
 
 Clone the repository.
 ```bash
-$ git clone https://github.com/zerious/ltl.git
+$ git clone https://github.com/lighterio/ltl.git
 ```
 
 Install dependencies.
