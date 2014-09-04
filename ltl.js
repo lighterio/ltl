@@ -68,7 +68,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.13',
+    version: '0.1.14',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -210,7 +210,7 @@
             blockFilter = 'coffee-script';
           }
           else if (blockFilter == 'md') {
-            blockFilter = 'markdown';
+            blockFilter = 'marked';
           }
           try {
             if (inBrowser) {
@@ -235,8 +235,8 @@
             text = text.replace(/(^\(function\(\) \{\s*|\s*\}\)\.call\(this\);\s*$)/g, '');
           }
         }
-        else if (blockFilter.markdown) {
-          text = blockFilter.markdown.toHTML(text);
+        else if (blockFilter.parse) {
+          text = blockFilter.parse(text);
         }
         else if (typeof blockFilter == 'function') {
           text = blockFilter(text);

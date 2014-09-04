@@ -10,7 +10,7 @@ describe('API', function () {
   });
   describe('ltl.version', function () {
     it('should expose version', function () {
-      is.in(/^[0-9]+\.[0-9]+\.[0-9]+$/, ltl.version);
+      is.in(ltl.version, /^[0-9]+\.[0-9]+\.[0-9]+$/);
       var pkg = require('../package.json');
       is(pkg.version, ltl.version);
     });
