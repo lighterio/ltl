@@ -10,22 +10,26 @@ describe('Blocks', function () {
     is(result, '<script>var a = 1;\nvar b = 2;</script>');
   });
   it('should work with markdown', function () {
-    var result = ltl.compile('p:md\n Heading\n =====')();
-    is.in(/<h1>Heading<\/h1>/, result);
-  });
-  it('should work without a tag', function () {
     var result = ltl.compile(':markdown\n # Heading')();
-    is(result, '<h1>Heading</h1>');
+    is('<h1>Heading</h1>', result);
+  });
+  it('should work with marked', function () {
+    var result = ltl.compile('p:marked\n # Heading')();
+    is.in(result, /<h1 id="heading">Heading<\/h1>/);
+  });
+  it('should work with marked aliased as md', function () {
+    var result = ltl.compile('p:md\n Heading\n =====')();
+    is.in(result, /<h1 id="heading">Heading<\/h1>/);
   });
   it('should work with CoffeeScript', function () {
     var result = ltl.compile('script:coffee\n a = 1')();
-    is.in(/var/, result);
+    is.in(result, /var/);
   });
   it('should unwrap CoffeeScript with NOWRAP', function () {
     var result = ltl.compile('script:coffee\n # NOWRAP\n a = 1')();
-    is.in(/var/, result);
-    is.notIn(/function/, result);
-    is.notIn(/call/, result);
+    is.in(result, /var/);
+    is.notIn(result, /function/);
+    is.notIn(result, /call/);
   });
   it('should work with text with line breaks', function () {
     var result = ltl.compile('p:\n First line.\n Second line.')();

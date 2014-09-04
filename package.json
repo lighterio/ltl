@@ -11,7 +11,7 @@
     "jade",
     "dot"
   ],
-  "version": "0.1.13",
+  "version": "0.1.14",
   "main": "ltl",
   "homepage": "http://lighter.io/ltl",
   "repository": "git://github.com/lighterio/ltl.git",
@@ -33,13 +33,14 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "coffee-script": "1.7.1",
-    "coveralls": "2.10.0",
+    "coffee-script": "1.8.0",
+    "coveralls": "2.11.1",
     "dot": "1.0.2",
-    "exam": "0.0.5",
-    "istanbul": "0.2.11",
-    "jade": "1.3.1",
+    "exam": "0.0.7",
+    "istanbul": "0.3.1",
+    "jade": "1.6.0",
     "markdown": "0.5.0",
+    "marked": "0.3.2",
     "zeriousify": "0.1.9"
   },
   "bugs": {

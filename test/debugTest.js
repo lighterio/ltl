@@ -17,7 +17,7 @@ describe('Debug', function () {
     }
     catch (e) {
       is(e.stack.indexOf('require'), -1);
-      is.in('[Ltl] Failed to compile template. Unexpected', e.message);
+      is.in(e.message, '[Ltl] Failed to compile template. Unexpected');
       done();
     }
   });
@@ -26,7 +26,7 @@ describe('Debug', function () {
       ltl.compile('p ={omg!}', {enableDebug: true});
     }
     catch (e) {
-      is.in('[Ltl] Failed to compile template. Unexpected', e.message);
+      is.in(e.message, '[Ltl] Failed to compile template. Unexpected');
       done();
     }
   });
@@ -35,13 +35,13 @@ describe('Debug', function () {
       ltl.compile('p ={omg!}', {name: 'wtf'});
     }
     catch (e) {
-      is.in('[Ltl] Failed to compile "wtf". Unexpected', e.message);
+      is.in(e.message, '[Ltl] Failed to compile "wtf". Unexpected');
     }
     try {
       ltl.compile('p ={omg!}', {name: 'wtf', enableDebug: true});
     }
     catch (e) {
-      is.in('[Ltl] Failed to compile "wtf". Unexpected', e.message);
+      is.in(e.message, '[Ltl] Failed to compile "wtf". Unexpected');
       done();
     }
   });
