@@ -10,7 +10,7 @@ The Ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
 HTML at [doT](https://github.com/olado/doT)-like speeds.
 
-If you love tight code and fast rendering, you're right at home.
+If you love tight code and fast rendering, you'll be right at home with Ltl.
 
 ## Getting Started
 
@@ -343,75 +343,3 @@ $ npm run report
 ```
 
 ### Write something awesome and submit a pull request!
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
-
-[![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
-[![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
-[![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
-[![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
-[![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
