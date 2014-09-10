@@ -1,10 +1,10 @@
 # Ltl
 
- [![NPM Version](https://badge.fury.io/js/ltl.png)](http://badge.fury.io/js/ltl)
- [![Build Status](https://travis-ci.org/lighterio/ltl.png?branch=master)](https://travis-ci.org/lighterio/ltl)
- [![Code Coverage](https://coveralls.io/repos/lighterio/ltl/badge.png?branch=master)](https://coveralls.io/r/lighterio/ltl)
- [![Dependencies](https://david-dm.org/lighterio/ltl.png?theme=shields.io)](https://david-dm.org/lighterio/ltl)
- [![Support](http://img.shields.io/gratipay/Lighter.io.png)](https://gratipay.com/Lighter.io/)
+[![NPM Version](https://img.shields.io/npm/v/ltl.svg) ![Downloads](https://img.shields.io/npm/dm/ltl.svg)](https://npmjs.org/package/ltl)
+[![Build Status](https://img.shields.io/travis/lighterio/ltl.svg)](https://travis-ci.org/lighterio/ltl)
+[![Code Coverage](https://img.shields.io/coveralls/lighterio/ltl/master.svg)](https://coveralls.io/r/lighterio/ltl)
+[![Dependencies](https://img.shields.io/david/lighterio/ltl.svg)](https://david-dm.org/lighterio/ltl)
+[![Support](https://img.shields.io/gratipay/Lighter.io.svg)](https://gratipay.com/Lighter.io/)
 
 The Ltl template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
@@ -31,8 +31,8 @@ var result = template({name: 'World'});
 ### ltl.compile(code, [options])
  * `code` is a string of ltl code.
  * `options` is an object with any of the following properties:
-  * `name` will cause the template to cache at `ltl.templates[name]`
-  * `space` causes HTML to be indented, using `space` as indentation.
+ * `name` will cause the template to cache at `ltl.templates[name]`
+ * `space` causes HTML to be indented, using `space` as indentation.
 
 ### ltl.setOption(name, value)
  * `name` is the name of a compiler option.
