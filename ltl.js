@@ -12,12 +12,15 @@
   // Supported control keywords (usage appears like tags).
   var controlPattern = /^(for|if|else|else if)\b/;
 
+  // Pattern for a JavaScript assignment.
+  var assignmentPattern = /^([$A-Za-z_][$A-Za-z_0-9\.\[\]'"]*\s*=[^\{])/;
+
   // Supported command keywords.
   var commandPattern = /^(call|get|set)\b/;
 
   // JavaScript tokens that don't need contextVar prepended for interpolation.
   // TODO: Flesh out this list?
-  var jsPattern = /^(true|false|null|NaN|Infinity|window|location|Math|console)$/;
+  var jsPattern = /^(true|false|null|NaN|Infinity|window|location|Math|console|this)$/;
 
   // Stores available single character variable names.
   var varCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$';
@@ -68,7 +71,7 @@
   var ltl = {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.14',
+    version: '0.1.15',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -105,6 +108,7 @@
       if (settings.enableDebug && !settings.space) {
         settings.space = '  ';
       }
+      var getPattern = new RegExp(settings.contextVar + '\\.get\\.([$A-Za-z_][$A-Za-z_\d]*)', 'ig');
 
       // Don't allow context/output/parts vars to become user vars.
       var vars = varCharacters;
@@ -165,10 +169,13 @@
         output += text;
       }
 
-      function startBlock(filter) {
+      function startBlock(filter, line) {
         blockIndent = indent + 1;
         blockFilter = filter;
         blockLines = [];
+        if (line) {
+          blockLines.push(line);
+        }
       }
 
       function appendBlock() {
@@ -298,7 +305,7 @@
         var c = settings.contextVar;
         var found = false;
 
-        script = script.replace(/^(for)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s+in\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
+        script = script.replace(/^(for)\s+([$A-Za-z_][$A-Za-z_\d]*)\s+in\s+([$A-Za-z_][$A-Za-z_\d\.]*)\s*$/,
           function(match, keyword, item, array) {
             found = true;
             var i = vars[varIndex++];
@@ -314,7 +321,7 @@
           return script;
         }
 
-        script = script.replace(/^(for)\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*,\s*([$a-zA-Z_][$a-zA-Z_0-9]*)\s+of\s+([$a-zA-Z_][$a-zA-Z_0-9]*)\s*$/i,
+        script = script.replace(/^(for)\s+([$A-Za-z_][$A-Za-z_\d]*)\s*,\s*([$A-Za-z_][$A-Za-z_\d]*)\s+of\s+([$A-Za-z_][$A-Za-z_\d\.]*)\s*$/,
           function(match, keyword, key, value, object) {
             found = true;
             var k = vars[varIndex++];
@@ -375,7 +382,13 @@
             isLoopVar = false;
           }
         }
-        return tokens.join('');
+        code = tokens.join('');
+        getPattern = /c\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
+        code = code.replace(getPattern, function (match, part) {
+          hasGets = true;
+          return settings.partsVar + "['" + part + "'].call(this," + settings.contextVar + ")";
+        });
+        return code;
       }
 
       /**
@@ -413,6 +426,7 @@
       var blockName = '';
       var blockSets = [];
       var hasGets = false;
+      var hasAssignments = false;
       var inComment = false;
 
       // Iterate over each line.
@@ -467,11 +481,19 @@
           appendText('script', script);
         }
 
+        // Assignment patterns just need to be contextified.
+        else if (assignmentPattern.test(line)) {
+          hasAssignments = true;
+          line = contextify(line) + ';';
+          appendText('script', line);
+        }
+
         // Expression patterns make things append.
         else if (commandPattern.test(line)) {
           var pair = trim(line).split(/\s+/);
           var command = pair[0];
           blockName = pair[1];
+          var content = pair[2];
           pair = blockName.split(':');
           blockName = pair[0];
           if (command == 'get') {
@@ -482,7 +504,7 @@
             if (pair[1] === '') {
               command += ':';
             }
-            startBlock(command);
+            startBlock(command, content);
           }
         }
 
@@ -708,6 +730,9 @@
       }
       if (encodeUriVar) {
         output = "function " + encodeUriVar + "(t){return (encodeURIComponent||escape)(t==null?'':''+t)};" + output;
+      }
+      if (hasAssignments) {
+        output = settings.contextVar + '=' + settings.contextVar + '||{};' + output;
       }
       output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
 

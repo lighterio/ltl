@@ -32,4 +32,19 @@ describe('Call', function () {
     var result = ltl.cache.index();
     is(result, '<!DOCTYPE html><html><head><title>ltl</title></head><body>ltl\nfast</body></html>');
   });
+  it('should create get-able values', function () {
+    ltl.compile('call hello\n set who: World', {name: 'temp'});
+    ltl.compile(': Hello, ${get.who}!', {name: 'hello'});
+    var result = ltl.cache.temp();
+    is(result, 'Hello, World!');
+  });
+  it('should create if-able values', function () {
+    ltl.compile('call hello\n set who: World', {name: 'known'});
+    ltl.compile('call hello\n set who: Nobody', {name: 'unknown'});
+    ltl.compile('if get.who == "World"\n : Hello, ${get.who}!\nelse\n : Does not compute.', {name: 'hello'});
+    var known = ltl.cache.known();
+    is(known, 'Hello, World!');
+    var unknown = ltl.cache.unknown();
+    is(unknown, 'Does not compute.');
+  });
 });
