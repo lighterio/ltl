@@ -14,12 +14,12 @@ If you love tight code and fast rendering, you'll be right at home with Ltl.
 
 ## Getting Started
 
-Install
+Add Ltl to your project.
 ```bash
-$ npm install ltl
+$ npm install --save ltl
 ```
 
-Use
+Compile and render templates.
 ```javascript
 var ltl = require('ltl');
 var template = ltl.compile('#hi Hello #{name}!');
@@ -29,7 +29,7 @@ var result = template({name: 'World'});
 
 ## API
 ### ltl.compile(code, [options])
- * `code` is a string of ltl code.
+ * `code` is a string of Ltl code.
  * `options` is an object with any of the following properties:
  * `name` will cause the template to cache at `ltl.templates[name]`
  * `space` causes HTML to be indented, using `space` as indentation.
@@ -38,11 +38,11 @@ var result = template({name: 'World'});
  * `name` is the name of a compiler option.
  * `value` is the default value you'd like to set it to.
 
-The following compiler options are available:
- * `outputVar` is the name of the variable that Ltl concatenates to. (Default: "o")
- * `contextVar` is the name of the argument that passes context into a template. (Default: "c")
- * `partsVar` is the name of the argument that a Ltl template receives from callers. (Default: "p")
- * `tabWidth` is the number of spaces that tabs are converted to before compilation. (Default: 4)
+Supported options:
+ * **outputVar** is the name of the variable that Ltl concatenates to. (Default: "o")
+ * **contextVar** is the name of the argument that passes context into a template. (Default: "c")
+ * **partsVar** is the name of the argument that a Ltl template receives from callers. (Default: "p")
+ * **tabWidth** is the number of spaces that tabs are converted to before compilation. (Default: 4)
 
 ## Language
 
@@ -113,7 +113,7 @@ they would be inside an HTML tag.
 ```html
 <div style="display:none;" data-something="peek-a-boo">Hide me</div>
 ```
-Note: Unlike Jade, ltl does not use commas between attributes.
+**Note:** Unlike Jade, Ltl does not use commas between attributes.
 
 ### Untagged Lines
 
@@ -131,7 +131,7 @@ h1
 
 ### Blocks
 
-You can output blocks of content using `:`.
+You can output blocks of content as plain text, using `:`.
 ```jade
 #blah:
   Bob Loblaw's Law Blog asks, "Why should YOU go
@@ -144,7 +144,7 @@ You can output blocks of content using `:`.
 </div>
 ```
 
-Blocks can be passed through filters, such as markdown.
+Blocks can also be passed through filters, such as `markdown`.
 ```jade
 :markdown
     # Ltl
@@ -153,6 +153,13 @@ Blocks can be passed through filters, such as markdown.
 ```html
 <h1>ltl</h1><p>It's a recursive acronym for "Ltl Template Language".</p>
 ```
+
+If a filter is unrecognized, Ltl will attempt to load it in the following ways:
+* **Client-side:** use `window['FILTER_NAME']`
+* **Server-side:** use `require('FILTER_NAME')`
+
+A filter must have a function named `compile` or `parse` which accepts a context
+and returns a string, or it can be such a function itself.
 
 ### Comments
 
@@ -227,9 +234,22 @@ code \${escaped} or \={raw}
 <code>${escaped} or ={raw}
 ```
 
+### Variable Assignment
+
+You can assign a value to a variable in the template context using `=`.
+```jade
+who = 'World'
+. Hello ${who}!
+```
+```html
+<p>Hello World!</p>
+```
+
 ### Control
 Use `for..in` to iterate over an array inside the context.
- * Context: `{list: ['IPA', 'Porter', 'Stout']}`
+
+*Context:* `{list: ['IPA', 'Porter', 'Stout']}`
+
 ```jade
 ul
   for item in list
@@ -240,13 +260,14 @@ ul
 ```
 
 Use `for..of` to iterate over an object's keys.
+
+*Context:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
 ```jade
-ul
-  for field, value of data
-    li #{field}: #{value}
+for drink, activity of pairings
+  . #{field} is for #{value}.
 ```
 ```html
-<ul><li>IPA</li><li>Porter</li><li>Stout</li></ul>
+<div>Coffee is for coding.</div><div>Beer is for bloviating</div>
 ```
 
 ### Conditionals
