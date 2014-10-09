@@ -4,7 +4,16 @@
 
 (function () {
 
-  var isBrowser = (typeof window == 'object');
+  // Configure Ltl for client-side or the server-side compilation.
+  var inBrowser = false;
+  var scope;
+  try {
+    inBrowser = window.document.body.tagName == 'BODY';
+    scope = window;
+  }
+  catch (e) {
+    scope = process;
+  }
 
   // Some HTML tags won't have end tags.
   var selfClosePattern = /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/)(\b|$)/;
@@ -30,9 +39,9 @@
     return text.replace(/(^\s+|\s+$)/g, '');
   }
 
-  // Remove starting/ending whitespace.
+  // Repeat a string.
   function repeat(text, times) {
-    return (new Array(times + 1)).join(text);
+    return times > 0 ? (new Array(times + 1)).join(text) : '';
   }
 
   // Escape single quotes with a backslash.
@@ -43,6 +52,27 @@
   // Escape text with possible line breaks for appending to a string.
   function escapeBlock(text) {
     return escapeSingleQuotes(text).replace(/\n/g, '\\n');
+  }
+
+  // Get a module for filtering.
+  function getFilter(name) {
+    var filters = ltl.filters;
+    var filter = filters[name];
+    if (!filter) {
+      filter = filters[name] = scope[name] || require(name);
+    }
+    if (!filter) {
+      var todo;
+      var into = ' into function that accepts a string and returns a string.';
+      if (inBrowser) {
+        var cmd = 'cd ' + scope.cwd() + '; npm install --save ' + name;
+        todo = 'Run "' + cmd + '", or make require("ltl").filters.' + name;
+      } else {
+        todo = 'Make window.ltl.filters.' + name;
+      }
+      throw new Error('[Ltl] Unknown filter: "' + name + '". ' + todo + into);
+    }
+    return filter;
   }
 
   // When compilation fails, we can re-run in debug mode.
@@ -67,14 +97,19 @@
     }
   }
 
-  // Public API.
-  var ltl = {
+  /**
+   * Ensure a single Ltl in the process or window, for universal block filters.
+   */
+  var ltl = scope.ltl = scope.ltl || {
 
     // Allow users to see what version of ltl they're using.
     version: '0.1.15',
 
     // Store all of the templates that have been compiled.
     cache: {},
+
+    // Store filter modules, such as "coffee-script" and "marked".
+    filters: {},
 
     // Default compile settings.
     _options: {
@@ -108,7 +143,7 @@
       if (settings.enableDebug && !settings.space) {
         settings.space = '  ';
       }
-      var getPattern = new RegExp(settings.contextVar + '\\.get\\.([$A-Za-z_][$A-Za-z_\d]*)', 'ig');
+      var getPattern = new RegExp(settings.contextVar + '\\.get\\.([$A-Za-z_][$A-Za-z_\\d]*)', 'ig');
 
       // Don't allow context/output/parts vars to become user vars.
       var vars = varCharacters;
@@ -118,14 +153,6 @@
 
       if (settings.space) {
         settings.space = escapeBlock(settings.space);
-      }
-
-      // Find out if we're in the browser.
-      var inBrowser = false;
-      try {
-        inBrowser = window.document.body.tagName == 'BODY';
-      }
-      catch (e) {
       }
 
       // Replace carriage returns for Windows compatibility.
@@ -141,11 +168,14 @@
       // Initialize the code, and start at level zero with no nesting.
       var lines = code.split('\n');
 
+      var globalSpaces = 0;
       var indent = 0;
       var stack = [];
       var mode = 'html';
       var previousTag;
       var hasHtmlOutput = false;
+      var hasAssignments = false;
+      var hasContent = false;
       var tagDepth = 0;
       var output = 'var ' + settings.outputVar + "='";
 
@@ -153,6 +183,16 @@
       var escapeHtmlVar = false;
       var encodeUriVar = false;
       var loopVars = [];
+
+      // If we end up in a dot block, remember the starting indent and filter, and gather lines.
+      var blockIndent = 0;
+      var blockFilter = '';
+      var blockLines = null;
+      var blockTag = null;
+      var blockName = '';
+      var blockSets = null;
+      var hasGets = false;
+      var inComment = false;
 
       function appendText(textMode, text) {
         if (textMode != mode) {
@@ -174,7 +214,7 @@
         blockFilter = filter;
         blockLines = [];
         if (line) {
-          blockLines.push(line);
+          (blockLines = blockLines || []).push(line);
         }
       }
 
@@ -208,7 +248,7 @@
           } else {
             block = "function(){return '" + escapeBlock(text) + "'}";
           }
-          blockSets.push("'" + escapeSingleQuotes(blockName) + "':" + block);
+          (blockSets = blockSets || []).push("'" + escapeSingleQuotes(blockName) + "':" + block);
           return;
         }
         // If there's a filter, get its module.
@@ -219,17 +259,7 @@
           else if (blockFilter == 'md') {
             blockFilter = 'marked';
           }
-          try {
-            if (inBrowser) {
-              blockFilter = window[blockFilter];
-            }
-            else {
-              blockFilter = require(blockFilter);
-            }
-          }
-          catch (e) {
-            throw new Error('Unknown filter "' + blockFilter + '". Try "npm install ' + blockFilter + '" first.');
-          }
+          blockFilter = getFilter(blockFilter);
         } else {
           blockFilter = 'text';
         }
@@ -417,18 +447,6 @@
         });
       }
 
-      // If we end up in a dot block, remember the starting indent and filter, and gather lines.
-      var blockIndent = 0;
-      var blockFilter = '';
-      var blockLines = [];
-      var blockTag = null;
-
-      var blockName = '';
-      var blockSets = [];
-      var hasGets = false;
-      var hasAssignments = false;
-      var inComment = false;
-
       // Iterate over each line.
       for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
@@ -438,19 +456,30 @@
 
         // If the line is all whitespace, ignore it.
         if (!/\S/.test(line)) {
+          if (blockIndent) {
+            (blockLines = blockLines || []).push('');
+          }
           continue;
         }
 
         // Find the number of leading spaces.
         var spaces = line.search(/[^ ]/);
 
+        // If the first line with content has leading spaces, assume they all do.
+        if (!hasContent) {
+          globalSpaces = spaces;
+          hasContent = true;
+        }
+
+        var adjustedSpaces = Math.max(spaces - globalSpaces, 0);
+
         // If this is our first time seeing leading spaces, that's our tab width.
-        if (spaces > 0 && !currentTabWidth) {
-          currentTabWidth = spaces;
+        if (adjustedSpaces > 0 && !currentTabWidth) {
+          currentTabWidth = adjustedSpaces;
         }
 
         // Calculate the number of levels of indentation.
-        indent = spaces ? Math.round(spaces / currentTabWidth) : 0;
+        indent = adjustedSpaces ? Math.round(adjustedSpaces / currentTabWidth) : 0;
 
         // If we're in a block, we can append or close it.
         if (blockIndent) {
@@ -461,7 +490,7 @@
           // If we're still in the block, append to the block code.
           else {
             line = line.substring(Math.min(spaces, currentTabWidth * blockIndent));
-            blockLines.push(line);
+            (blockLines = blockLines || []).push(line);
             continue;
           }
         }
@@ -493,7 +522,7 @@
           var pair = trim(line).split(/\s+/);
           var command = pair[0];
           blockName = pair[1];
-          var content = pair[2];
+          var blockContent = pair[2];
           pair = blockName.split(':');
           blockName = pair[0];
           if (command == 'get') {
@@ -504,7 +533,7 @@
             if (pair[1] === '') {
               command += ':';
             }
-            startBlock(command, content);
+            startBlock(command, blockContent);
           }
         }
 
@@ -519,9 +548,9 @@
             var id = '';
             var classes = [];
             var attributes = '';
-            var content = '';
             var character = '';
             var end = 0;
+            var content = '';
 
             // Process the rest of the line recursively.
             while (rest && (++t < maxT)) {
@@ -599,7 +628,7 @@
                 rest = rest.substring(1).split(' ');
                 startBlock(rest.shift());
                 if (rest.length > 0) {
-                  blockLines.push(rest.join(' '));
+                  (blockLines = blockLines || []).push(rest.join(' '));
                 }
                 rest = '';
                 break;
@@ -720,7 +749,7 @@
       // Add the return statement (ending concatenation, where applicable).
       appendText('script', 'return ' + settings.outputVar);
 
-      if (blockSets.length) {
+      if (blockSets) {
         return '{' + blockSets.join(',') + '}';
       }
 
@@ -763,10 +792,7 @@
     }
   };
 
-  if (isBrowser) {
-    window.ltl = ltl;
-  }
-  else {
+  if (scope.nextTick) {
     module.exports = ltl;
   }
 

@@ -4,19 +4,19 @@ require('zeriousify').test();
 
 describe('API', function () {
   describe('ltl', function () {
-    it('should be an object', function () {
+    it('is an object', function () {
       is.object(ltl);
     });
   });
   describe('ltl.version', function () {
-    it('should expose version', function () {
+    it('exposes the module version', function () {
       is.in(ltl.version, /^[0-9]+\.[0-9]+\.[0-9]+$/);
       var pkg = require('../package.json');
       is(pkg.version, ltl.version);
     });
   });
   describe('ltl.setOption("tabWidth", int)', function () {
-    it('should modify tab/space leniency', function () {
+    it('modifies tab/space leniency', function () {
       ltl.setOption("tabWidth", 1);
       var result = ltl.compile('ul\n li\n\tli')();
       is(result, '<ul><li></li><li></li></ul>');
@@ -27,7 +27,7 @@ describe('API', function () {
     });
   });
   describe('ltl.setOption("outputVar", string)', function () {
-    it('should modify output variable', function () {
+    it('modifies output variable', function () {
       ltl.setOption("outputVar", 'html');
       var code = ltl.compile('p').toString();
       is(code, "function (c){var html='<p></p>';return html}");
@@ -35,13 +35,13 @@ describe('API', function () {
       code = ltl.compile('p').toString();
       is(code, "function (c){var o='<p></p>';return o}");
     });
-    it('should override output variable', function () {
+    it('overrides the output variable', function () {
       var code = ltl.compile('p', {outputVar: 'out'}).toString();
       is(code, "function (c){var out='<p></p>';return out}");
     });
   });
   describe('ltl.setOption("contextVar", string)', function () {
-    it('should modify context variable', function () {
+    it('modifies the context variable', function () {
       ltl.setOption("contextVar", 'context');
       var code = ltl.compile('p').toString();
       is(code, "function (context){var o='<p></p>';return o}");
@@ -51,13 +51,13 @@ describe('API', function () {
     });
   });
   describe('ltl.setOption("partsVar", string)', function () {
-    it('should modify parts variable', function () {
+    it('modifies the parts variable', function () {
       ltl.setOption("partsVar", 'parts');
       ltl.setOption("partsVar", 'p');
     });
   });
   describe('ltl.setOption("space", string)', function () {
-    it('should modify space variable', function () {
+    it('modifies the space variable', function () {
       ltl.setOption('space', '\t');
       var result = ltl.compile('.\n p hi')();
       is(result, '<div>\n\t<p>hi</p>\n</div>');
@@ -65,17 +65,17 @@ describe('API', function () {
     });
   });
   describe('ltl.compile', function () {
-    it('should be a function', function () {
+    it('is a function', function () {
       is.function(ltl.compile);
     });
   });
   describe('ltl.compile(string)', function () {
-    it('should return a function', function () {
+    it('returns a template function', function () {
       is.function(ltl.compile(''));
     });
   });
   describe('module', function () {
-    it('should populate the window object if it exists', function () {
+    it('populates the window object if it exists', function () {
       var cache = {};
       var key;
       for (key in require.cache) {

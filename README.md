@@ -1,33 +1,41 @@
-# Ltl
-
-[![NPM Version](https://img.shields.io/npm/v/ltl.svg) ![Downloads](https://img.shields.io/npm/dm/ltl.svg)](https://npmjs.org/package/ltl)
+# <a href="http://lighter.io/ltl" style="font-size:40px;text-decoration:none;color:#000"><img src="https://cdn.rawgit.com/lighterio/lighter.io/master/public/ltl.svg" style="width:90px;height:90px"> Ltl</a>
+[![NPM Version](https://img.shields.io/npm/v/ltl.svg)](https://npmjs.org/package/ltl)
+[![Downloads](https://img.shields.io/npm/dm/ltl.svg)](https://npmjs.org/package/ltl)
 [![Build Status](https://img.shields.io/travis/lighterio/ltl.svg)](https://travis-ci.org/lighterio/ltl)
 [![Code Coverage](https://img.shields.io/coveralls/lighterio/ltl/master.svg)](https://coveralls.io/r/lighterio/ltl)
 [![Dependencies](https://img.shields.io/david/lighterio/ltl.svg)](https://david-dm.org/lighterio/ltl)
 [![Support](https://img.shields.io/gratipay/Lighter.io.svg)](https://gratipay.com/Lighter.io/)
 
-The Ltl template language (pronounced "little") uses a clean
+
+## TL;DR
+
+The [Ltl](http://lighter.io/ltl) template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
 HTML at [doT](https://github.com/olado/doT)-like speeds.
 
 If you love tight code and fast rendering, you'll be right at home with Ltl.
 
-## Getting Started
 
-Add Ltl to your project.
+## Quick Start
+
+Add `ltl` to your project:
 ```bash
-$ npm install --save ltl
+npm install --save ltl
 ```
 
-Compile and render templates.
+Compile and render templates:
 ```javascript
-var ltl = require('ltl');
-var template = ltl.compile('#hi Hello #{name}!');
-var result = template({name: 'World'});
-// result: '<div id="hi">Hello World!</div>'
+var ltl = require("ltl");
+var template = ltl.compile("#hi Hello ${who}!");
+var result = template({who: "World"});
 ```
+```html
+<div id="hi">Hello World!</div>
+```
+
 
 ## API
+
 ### ltl.compile(code, [options])
  * `code` is a string of Ltl code.
  * `options` is an object with any of the following properties:
@@ -39,10 +47,11 @@ var result = template({name: 'World'});
  * `value` is the default value you'd like to set it to.
 
 Supported options:
- * **outputVar** is the name of the variable that Ltl concatenates to. (Default: "o")
- * **contextVar** is the name of the argument that passes context into a template. (Default: "c")
- * **partsVar** is the name of the argument that a Ltl template receives from callers. (Default: "p")
- * **tabWidth** is the number of spaces that tabs are converted to before compilation. (Default: 4)
+ * `outputVar` is the name of the variable that Ltl concatenates to. (Default: "o")
+ * `contextVar` is the name of the argument that passes context into a template. (Default: "c")
+ * `partsVar` is the name of the argument that a Ltl template receives from callers. (Default: "p")
+ * `tabWidth` is the number of spaces that tabs are converted to before compilation. (Default: 4)
+
 
 ## Language
 
@@ -147,8 +156,8 @@ You can output blocks of content as plain text, using `:`.
 Blocks can also be passed through filters, such as `markdown`.
 ```jade
 :markdown
-    # Ltl
-    It's a recursive acronym for "Ltl Template Language".
+  # Ltl
+  It's a recursive acronym for "Ltl Template Language".
 ```
 ```html
 <h1>ltl</h1><p>It's a recursive acronym for "Ltl Template Language".</p>
@@ -320,47 +329,89 @@ ltl.cache.page();
 ```
 
 
-## Contributing
+## Acknowledgements
 
-Clone the repository.
-```bash
-$ git clone https://github.com/lighterio/ltl.git
-```
+We would like to thank all of the amazing people who use, support,
+promote, enhance, document, patch, and submit comments & issues.
+Ltl couldn't exist without you.
 
-Install dependencies.
-```bash
-$ npm install
-```
+Additionally, huge thanks go to [TUNE](http://www.tune.com) for employing
+and supporting [Ltl](http://lighter.io/ltl) project maintainers,
+and for being an epically awesome place to work (and play).
 
-### Testing
 
-Run all tests.
-```bash
-$ npm test
-```
+## MIT License
 
-Run tests an rerun them after changes are made.
-```bash
-$ npm run retest
-```
+Copyright (c) 2014 Sam Eubank
 
-Run individual test files.
-```bash
-$ mocha test/api
-$ mocha test/blocks
-$ mocha test/control
-$ mocha test/interpolation
-...
-```
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Test coverage (100% required).
-```bash
-$ npm run cover
-```
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-View coverage report in a browser (uses Mac OS-friendly `open`).
-```bash
-$ npm run report
-```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-### Write something awesome and submit a pull request!
+
+## How to Contribute
+
+We welcome contributions from the community and are happy to have them.
+Please follow this guide when logging issues or making code changes.
+
+### Logging Issues
+
+All issues should be created using the
+[new issue form](https://github.com/lighterio/ltl/issues/new).
+Please describe the issue including steps to reproduce. Also, make sure
+to indicate the version that has the issue.
+
+### Changing Code
+
+Code changes are welcome and encouraged! Please follow our process:
+
+1. Fork the repository on GitHub.
+2. Fix the issue ensuring that your code follows the
+   [style guide](http://lighter.io/style-guide).
+3. Add tests for your new code, ensuring that you have 100% code coverage.
+   (If necessary, we can help you reach 100% prior to merging.)
+   * Run `npm test` to run tests quickly, without testing coverage.
+   * Run `npm run cover` to test coverage and generate a report.
+   * Run `npm run report` to open the coverage report you generated.
+4. [Pull requests](http://help.github.com/send-pull-requests/) should be made
+   to the [master branch](https://github.com/lighterio/ltl/tree/master).
+
+### Contributor Code of Conduct
+
+As contributors and maintainers of Ltl, we pledge to respect all
+people who contribute through reporting issues, posting feature requests,
+updating documentation, submitting pull requests or patches, and other
+activities.
+
+If any participant in this project has issues or takes exception with a
+contribution, they are obligated to provide constructive feedback and never
+resort to personal attacks, trolling, public or private harassment, insults, or
+other unprofessional conduct.
+
+Project maintainers have the right and responsibility to remove, edit, or
+reject comments, commits, code, edits, issues, and other contributions
+that are not aligned with this Code of Conduct. Project maintainers who do
+not follow the Code of Conduct may be removed from the project team.
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be
+reported by opening an issue or contacting one or more of the project
+maintainers.
+
+We promise to extend courtesy and respect to everyone involved in this project
+regardless of gender, gender identity, sexual orientation, ability or
+disability, ethnicity, religion, age, location, native language, or level of
+experience.
