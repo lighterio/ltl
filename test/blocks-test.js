@@ -50,6 +50,9 @@ describe('Blocks', function () {
   it('work in the browser', function () {
     global.window = {
       document: {body: {tagName: 'BODY'}},
+      ltl: ltl
+    };
+    ltl.filters = {
       uppercaser: function (text) {
         return text.toUpperCase();
       }

@@ -7,8 +7,6 @@
 [![Support](https://img.shields.io/gratipay/Lighter.io.svg)](https://gratipay.com/Lighter.io/)
 
 
-## TL;DR
-
 The [Ltl](http://lighter.io/ltl) template language (pronounced "little") uses a clean
 [Jade](http://jade-lang.com/reference/)-like syntax to generate
 HTML at [doT](https://github.com/olado/doT)-like speeds.

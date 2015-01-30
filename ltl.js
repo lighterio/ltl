@@ -1,19 +1,11 @@
 /**
- * ltl is a template language designed to be simple, beautiful and fast.
+ * Ltl is a template language designed to be simple, beautiful and fast.
  */
 
 (function () {
 
-  // Configure Ltl for client-side or the server-side compilation.
-  var inBrowser = false;
-  var scope;
-  try {
-    inBrowser = window.document.body.tagName == 'BODY';
-    scope = window;
-  }
-  catch (e) {
-    scope = process;
-  }
+  // Configure Ltl for client-side or server-side compilation.
+  var scope = this;
 
   // Some HTML tags won't have end tags.
   var selfClosePattern = /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/)(\b|$)/;
@@ -64,11 +56,11 @@
     if (!filter) {
       var todo;
       var into = ' into function that accepts a string and returns a string.';
-      if (inBrowser) {
+      if (scope.cwd) {
         var cmd = 'cd ' + scope.cwd() + '; npm install --save ' + name;
         todo = 'Run "' + cmd + '", or make require("ltl").filters.' + name;
       } else {
-        todo = 'Make window.ltl.filters.' + name;
+        todo = 'Set window.ltl.filters.' + name;
       }
       throw new Error('[Ltl] Unknown filter: "' + name + '". ' + todo + into);
     }
@@ -78,7 +70,7 @@
   // When compilation fails, we can re-run in debug mode.
   function debug(output, settings) {
     var fs = require('fs');
-    var dir = process.cwd() + '/.debug';
+    var dir = process.cwd() + '/.cache';
     var name = (settings.name || 'template').replace(/[\/\\]/g, '__');
     try {
       fs.mkdirSync(dir);
@@ -103,7 +95,7 @@
   var ltl = scope.ltl = scope.ltl || {
 
     // Allow users to see what version of ltl they're using.
-    version: '0.1.15',
+    version: '0.2.0',
 
     // Store all of the templates that have been compiled.
     cache: {},
@@ -155,6 +147,10 @@
         settings.space = escapeBlock(settings.space);
       }
 
+      // Build a line-based source map.
+      var source = code;
+      var map = [];
+
       // Replace carriage returns for Windows compatibility.
       code = code.replace(/\r/g, '');
 
@@ -167,6 +163,8 @@
 
       // Initialize the code, and start at level zero with no nesting.
       var lines = code.split('\n');
+      var lineIndex;
+      var lineCount = lines.length;
 
       var globalSpaces = 0;
       var indent = 0;
@@ -177,6 +175,7 @@
       var hasAssignments = false;
       var hasContent = false;
       var tagDepth = 0;
+
       var output = 'var ' + settings.outputVar + "='";
 
       var varIndex = 0;
@@ -190,9 +189,14 @@
       var blockLines = null;
       var blockTag = null;
       var blockName = '';
+      var blockContent = '';
       var blockSets = null;
       var hasGets = false;
       var inComment = false;
+
+      // Support adding properties like "js" to the template function.
+      var properties = {};
+      var blockProperty = '';
 
       function appendText(textMode, text) {
         if (textMode != mode) {
@@ -209,12 +213,19 @@
         output += text;
       }
 
-      function startBlock(filter, line) {
+      function prependText(text) {
+        output = text + output;
+      }
+
+      function startBlock(filter, content) {
         blockIndent = indent + 1;
         blockFilter = filter;
         blockLines = [];
-        if (line) {
-          (blockLines = blockLines || []).push(line);
+        if (filter == 'call') {
+
+        }
+        if (content) {
+          (blockLines = blockLines || []).push(content);
         }
       }
 
@@ -235,12 +246,14 @@
 
         // If we're in a "call" block, compile the contents.
         if (blockFilter == 'call') {
+          blockContent = blockContent || '';
           appendText('html',
             "'+this['" + blockName + "'].call(this," + settings.contextVar +
+            (blockContent ? "['" + blockContent + "']" : '') +
             (text ? ',' + ltl.compile(text, blockOptions) : '') + ")+'");
           return;
         }
-        // For a "set" block.
+        // For a "set" block, add to the array of "set" block values.
         else if (blockFilter == 'set' || blockFilter == 'set:') {
           var block;
           if (blockFilter == 'set') {
@@ -259,24 +272,40 @@
           else if (blockFilter == 'md') {
             blockFilter = 'marked';
           }
-          blockFilter = getFilter(blockFilter);
-        } else {
-          blockFilter = 'text';
-        }
+          var compiler = getFilter(blockFilter);
 
-        // Detect the module's API, and filter the text.
-        if (blockFilter.compile) {
-          var nowrap = /^[^A-Z]*NOWRAP/.test(text);
-          text = blockFilter.compile(text);
-          if (nowrap) {
-            text = text.replace(/(^\(function\(\) \{\s*|\s*\}\)\.call\(this\);\s*$)/g, '');
+          if (compiler.renderSync) {
+            text = compiler.renderSync(text, {
+              data: text,
+              compressed: true
+            });
+          }
+          else if (compiler.render) {
+            if (blockFilter == 'less') {
+              compiler.render(text, function (err, result) {
+                text = result.css;
+              });
+            }
+            else {
+              text = compiler.render(text);
+            }
+          }
+          else if (compiler.compile) {
+            var nowrap = /^[^A-Z]*NOWRAP/.test(text);
+            text = compiler.compile(text);
+            if (nowrap) {
+              text = text.replace(/(^\(function\(\) \{\s*|\s*\}\)\.call\(this\);\s*$)/g, '');
+            }
+          }
+          else if (compiler.parse) {
+            text = compiler.parse(text);
+          }
+          else if (typeof compiler == 'function') {
+            text = compiler(text);
           }
         }
-        else if (blockFilter.parse) {
-          text = blockFilter.parse(text);
-        }
-        else if (typeof blockFilter == 'function') {
-          text = blockFilter(text);
+        else {
+          blockFilter = 'text';
         }
 
         text = trim(text);
@@ -290,10 +319,18 @@
           }
         }
 
-        appendText('html', escapeBlock(text));
+        if (blockProperty) {
+          var value = properties[blockProperty];
+          value = (value ? value + '\n' : '') + text;
+          properties[blockProperty] = value;
+        }
+        else {
+          appendText('html', escapeBlock(text));
+        }
 
         blockTag = null;
         blockFilter = null;
+        blockProperty = null;
       }
 
       function backtrackIndent() {
@@ -448,8 +485,9 @@
       }
 
       // Iterate over each line.
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
+      for (lineIndex = 0; lineIndex < lineCount; lineIndex++) {
+        var line = lines[lineIndex];
+        map[lineIndex] = map[lineIndex] || (blockName ? 0 : output.length);
 
         // Mitigate recursion past 100 deep.
         var maxT = 1e2;
@@ -519,17 +557,20 @@
 
         // Expression patterns make things append.
         else if (commandPattern.test(line)) {
-          var pair = trim(line).split(/\s+/);
-          var command = pair[0];
-          blockName = pair[1];
-          var blockContent = pair[2];
-          pair = blockName.split(':');
+          var data = trim(line).split(/\s+/);
+          var command = data.shift();
+          blockName = data.shift();
+          blockContent = data.join(' ');
+          var pair = blockName.split(':');
           blockName = pair[0];
           if (command == 'get') {
             appendText('html', "'+" + settings.partsVar + "['" + blockName + "'].call(this," + settings.contextVar + ")+'");
             hasGets = true;
           }
           else {
+            if (blockName) {
+              map[lineIndex + 1] = blockName;
+            }
             if (pair[1] === '') {
               command += ':';
             }
@@ -622,14 +663,22 @@
                 break;
               }
 
-              // If the next character is a colon, enter a block.
+              // If the next character is a colon, enter a filter block.
               else if (character == ':') {
                 blockTag = tag;
                 rest = rest.substring(1).split(' ');
-                startBlock(rest.shift());
-                if (rest.length > 0) {
-                  (blockLines = blockLines || []).push(rest.join(' '));
-                }
+                startBlock(rest.shift(), rest.join(' '));
+                rest = '';
+                break;
+              }
+
+              // If the next character is a plus, store it as a property.
+              else if (character == '+') {
+                rest.replace(/^\+([^:\s]+):?(\S*)\s?(.*)$/, function (match, name, filter, content) {
+                  blockProperty = name;
+                  blockTag = '';
+                  startBlock(filter, content);
+                });
                 rest = '';
                 break;
               }
@@ -754,16 +803,24 @@
       }
 
       // Create the function.
+      var prepend = '';
       if (escapeHtmlVar) {
-        output = "function " + escapeHtmlVar + "(t){return (t==null?'':''+t).replace(/</g,'&lt;')};" + output;
+        prepend = "function " + escapeHtmlVar + "(t){return (!t&&t!==0?'':''+t).replace(/</g,'&lt;')};" + prepend;
       }
       if (encodeUriVar) {
-        output = "function " + encodeUriVar + "(t){return (encodeURIComponent||escape)(t==null?'':''+t)};" + output;
+        prepend = "function " + encodeUriVar + "(t){return (encodeURIComponent||escape)(t==null?'':''+t)};" + prepend;
       }
       if (hasAssignments) {
-        output = settings.contextVar + '=' + settings.contextVar + '||{};' + output;
+        prepend = settings.contextVar + '=' + settings.contextVar + '||{};' + prepend;
       }
-      output = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + output + '}';
+      prepend = 'function(' + settings.contextVar + (hasGets ? ',' + settings.partsVar : '') + '){' + prepend;
+      for (var i = 0; i < map.length; i++) {
+        var pos = map[i];
+        if (pos && !isNaN(pos)) {
+          map[i] = pos + prepend.length;
+        }
+      }
+      output = prepend + output + '}';
 
       // Evaluate the template as a function.
       try {
@@ -782,6 +839,12 @@
         }
       }
       var template = eval.f;
+      template.source = source;
+      template.map = map;
+
+      for (var key in properties) {
+        template[key] = template[key] || properties[key];
+      }
 
       // If there's a name specified, cache the template with that name.
       if (settings.name) {
@@ -792,8 +855,21 @@
     }
   };
 
-  if (scope.nextTick) {
+  // Support CommonJS.
+  if (typeof exports == 'object') {
     module.exports = ltl;
+  }
+
+  // Support AMD.
+  else if (typeof define == 'function' && define.amd) {
+    define(function() {
+      return ltl;
+    });
+  }
+
+  // Support browsers.
+  else {
+    this.ltl = ltl;
   }
 
 })();
