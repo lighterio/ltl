@@ -1,17 +1,20 @@
 var ltl = require('../ltl');
 
 describe('Debug', function () {
-  it('should add whitespace to html', function () {
+
+  it('adds whitespace to html', function () {
     var disabled = ltl.compile('p\n br', {enableDebug: false}).toString();
-    is(disabled, "function (c){var o='<p><br></p>';return o}");
+    is(disabled, "function (s){var o='<p><br></p>';return o}");
     var enabled = ltl.compile('p\n br', {enableDebug: true}).toString();
-    is(enabled, "function (c){var o='<p>\\n  <br>\\n</p>';return o}");
+    is(enabled, "function (s){var o='<p>\\n  <br>\\n</p>';return o}");
   });
-  it('should add whitespace to JS', function () {
+
+  it('adds whitespace to JS', function () {
     var template = ltl.compile('br\nif a\n for i in x\n  i Hi', {enableDebug: true});
-    is(template.toString(), "function (c){var o='<br>';if(c.a){for(var d,a=0,b=c.x.length;a<b;++a){d=c.x[a];o+='\\n<i>Hi</i>'}}return o}");
+    is(template.toString(), "function (s){var o='<br>';if(s.a){for(var c,a=0,b=s.x.length;a<b;++a){c=s.x[a];o+='\\n<i>Hi</i>'}}return o}");
   });
-  it('should throw an error if not enabled', function (done) {
+
+  it('throws an error if not enabled', function (done) {
     try {
       ltl.compile('p ={omg!}');
     }
@@ -21,7 +24,8 @@ describe('Debug', function () {
       done();
     }
   });
-  it('should write a file and throw a more detailed error if enabled', function (done) {
+
+  it('writes a file and throw a more detailed error if enabled', function (done) {
     try {
       ltl.compile('p ={omg!}', {enableDebug: true});
     }
@@ -30,7 +34,8 @@ describe('Debug', function () {
       done();
     }
   });
-  it('should call the template by name', function (done) {
+
+  it('calls the template by name', function (done) {
     try {
       ltl.compile('p ={omg!}', {name: 'wtf'});
     }
@@ -45,4 +50,5 @@ describe('Debug', function () {
       done();
     }
   });
+
 });
