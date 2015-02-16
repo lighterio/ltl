@@ -20,3 +20,5 @@ test
 build
 .travis.yml
 .npmignore
+.editorconfig
+.jshintrc

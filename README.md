@@ -45,11 +45,10 @@ var result = template({who: "World"});
  * `value` is the default value you'd like to set it to.
 
 Supported options:
- * `outputVar` is the name of the variable that Ltl concatenates to. (Default: "o")
- * `contextVar` is the name of the argument that passes context into a template. (Default: "c")
- * `partsVar` is the name of the argument that a Ltl template receives from callers. (Default: "p")
  * `tabWidth` is the number of spaces that tabs are converted to before compilation. (Default: 4)
 
+### ltl.targets
+Targets are key-value pairs of transpiler names and target language names.
 
 ## Language
 
@@ -165,7 +164,7 @@ If a filter is unrecognized, Ltl will attempt to load it in the following ways:
 * **Client-side:** use `window['FILTER_NAME']`
 * **Server-side:** use `require('FILTER_NAME')`
 
-A filter must have a function named `compile` or `parse` which accepts a context
+A filter must have a function named `compile` or `parse` which accepts a state
 and returns a string, or it can be such a function itself.
 
 ### Comments
@@ -198,7 +197,7 @@ p Hello
 
 ### Interpolation
 
-You can output the value of a context property with `${..}`,
+You can output the value of a state property with `${..}`,
 and special HTML characters will be escaped for you to
 prevent silly little XSS attacks.
 ```javascript
@@ -212,7 +211,7 @@ template({name: 'Sam'});
 
 To encode for a URL rather than HTML, use `&{}`.
 
-Context: `{query: "good brewpubs"}`
+State: `{query: "good brewpubs"}`
 ```jade
 a(href="?q=&{query}")
 ```
@@ -224,7 +223,7 @@ If you'd like your content to skip encoding (because
 you want your expression to output raw HTML tags rather
 than safely escaped text), use `={..}`.
 
-Context: `{unsafe: "<script>alert('Gotcha!')</script>"}`
+State: `{unsafe: "<script>alert('Gotcha!')</script>"}`
 ```jade
 . ={unsafe}
 ```
@@ -243,7 +242,7 @@ code \${escaped} or \={raw}
 
 ### Variable Assignment
 
-You can assign a value to a variable in the template context using `=`.
+You can assign a value to a variable in the template state using `=`.
 ```jade
 who = 'World'
 . Hello ${who}!
@@ -253,14 +252,14 @@ who = 'World'
 ```
 
 ### Control
-Use `for..in` to iterate over an array inside the context.
+Use `for..in` to iterate over an array inside the state.
 
-*Context:* `{list: ['IPA', 'Porter', 'Stout']}`
+*State:* `{list: ['IPA', 'Porter', 'Stout']}`
 
 ```jade
 ul
   for item in list
-    li #{item}
+    li ${item}
 ```
 ```html
 <ul><li>IPA</li><li>Porter</li><li>Stout</li></ul>
@@ -268,10 +267,10 @@ ul
 
 Use `for..of` to iterate over an object's keys.
 
-*Context:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
+*State:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
 ```jade
 for drink, activity of pairings
-  . #{field} is for #{value}.
+  . ${field} is for ${value}.
 ```
 ```html
 <div>Coffee is for coding.</div><div>Beer is for bloviating</div>
@@ -298,15 +297,15 @@ if Math.random() > 0.5
 ```
 
 
-### Using templates within templates
+### Calling templates within templates
 
 A template can call another template with `call`. To accomplish
 this, you must compile your templates with `options.name`, and
 they will be stored in `ltl.cache`. The template that's being
-called can access the data context.
-```jade
+called can access the data state.
+```js
 var temp = ltl.compile('p\n call bold', {name: 'temp'});
-var bold = ltl.compile('b #{text}', {name: 'bold'});
+var bold = ltl.compile('b ${text}', {name: 'bold'});
 ltl.cache.temp({text: 'Hi!'});
 ```
 ```
@@ -317,7 +316,7 @@ With `set` and `get`, a template can get content from a
 template that calls it. The calling template declares what
 it will pass using `set` blocks, and the called template
 reads data with `get` blocks.
-```jade
+```js
 var layout = ltl.compile('#nav\n get nav\n#content\n get content', {name: 'layout'});
 var page = ltl.compile('call layout\n set nav\n  . Nav\n set content\n  . Content', {name: 'page'});
 ltl.cache.page();
@@ -326,6 +325,117 @@ ltl.cache.page();
 <div id="nav">Nav</div><div id="content">Content</div>
 ```
 
+#### Passing sub-states
+
+A template can pass a portion of its state to another template by naming the
+sub-state property after the template name in a call block:
+
+**parent/view.ltl**:
+```jade
+p Expect a state like... {child: {name: "only child"}}
+
+call child/view child
+```
+
+**child/view.ltl**
+```
+p This child is called ${name}.
+```
+
+### Template properties
+
+A template can have properties applied to it by using a plus symbol.
+
+**extra.ltl**:
+```jade
+html
+  head>title Template Properties
+  body:md
+    Properties can be used to provide hidden values to systems that compile
+    Ltl templates, such as [Chug](http://lighter.io/chug).
+
++extra
+  When compiled, the template will become a JavaScript function as usual.
+  In addition, it will have a property called "extra", whose value will be
+  a string containing the contents of this block.
+
++extra
+  If the plus symbol is used more than once for the same property, the value
+  of that property will be a concatenation of multiple blocks.
+
++also:md
+  # Also supports filters
+  Properties can have filters. This block will be evaluated as markdown,
+  and the resulting value will be set as the "also" property of the template.
+
+// Note:
+  There are several reserved
+```
+
+### JS and CSS properties
+
+The **js** and **css** properties of a template can be set using the plus
+symbol, just like other properties. Unlike including JS or CSS in a script or
+style tag block, these properties would need to be added to a page externally
+in order to affect the HTML.
+
+**js-and-css.ltl**:
+```jade
+p This will be included in the template's rendered HTML.
+
++js
+  console.log("This will not be included in the template's js property.");
+
++css
+  p {color: black}
+```
+
+In addition, several languages that compile to JS/CSS are supported. Their
+compilers can be invoked using their corresponding file extensions. For
+JS, Ltl supports **coffee**, **litcoffee**, **iced**, **es6**,
+and **ts**. For CSS, it supports **less**, **scss** and **styl**.
+
+
+**coffee-and-less.ltl**:
+```jade
+p:md
+  This template will compile to a function which returns this paragraph, and
+  the function will have **js** and **css** properties.
+
++coffee
+  console.log "Hello from CoffeeScript!"
+
++styl
+  @textColor: #000;
+
+  p {
+    color: @textColor;
+  }
+```
+
+### Inline JS and CSS
+JavaScript and CSS can also be included inline in a template using directives
+that appear as tags. Just as with JS and CSS properties, these support
+compilers such as CoffeeScript and LESS.
+
+
+**inline-js-and-css.ltl**
+```jade
+less
+  a {color: #000;}
+
+coffee
+  s.linkText = 'hello'
+
+a ${linkText}
+```
+
+The state variable in a template is called `s`, so the above would set the
+`linkText` value in the state object, and then it would render the following
+HTML if called:
+```html
+<style>a {color: #000;}</style><a>hello</a>
+```
 
 ## Acknowledgements
 

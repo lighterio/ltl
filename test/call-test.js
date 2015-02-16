@@ -56,7 +56,7 @@ describe('Call', function () {
     is(unknown, 'Does not compute.');
   });
 
-  it('passes sub-contexts', function () {
+  it('passes sub-states', function () {
     ltl.compile('call foo what', {name: 'bar'});
     ltl.compile(': foo={that}', {name: 'foo'});
     var result = ltl.cache.bar({what: {that: 'bar'}});

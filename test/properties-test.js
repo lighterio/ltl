@@ -23,4 +23,11 @@ describe('Properties', function () {
     is.in(template.js, ';');
   });
 
+  it('populate based on target language', function () {
+    var template = ltl.compile('+coffee\n  a = 1');
+    var result = template();
+    is(result, '');
+    is.in(template.js, ';');
+  });
+
 });

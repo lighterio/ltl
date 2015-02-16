@@ -6,5 +6,5 @@ catch (e) {
   // If Zeriousify isn't installed globally, skip it.
 }
 if (zeriousify) {
-  zeriousify.test();
+  //zeriousify.test();
 }
