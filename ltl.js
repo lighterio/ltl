@@ -22,7 +22,7 @@ var ltl = this.ltl = this.ltl || {
   // Supported command keywords.
   commandPattern: /^(call|get|set)\b/,
 
-  // JavaScript tokens that don't need the state "s" prepended for interpolation.
+  // JavaScript tokens that don't need the state "state" prepended for interpolation.
   // TODO: Flesh out this list?
   jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|this|Math|Object|Date|Error|RegExp|JSON)$/,
 
@@ -103,9 +103,9 @@ var ltl = this.ltl = this.ltl || {
     }
   ),
 
-  // Store all of the templates that have been compiled.
+  // Store templates that have been compiled.
+  // Include 2 built-ins for interpolation.
   cache: {
-    '-': function(v){return '<!--'+(JSON.stringify(v)||'').replace(/-->/g,'--\\>')+'-->';},
     '$': function(v){return (!v&&v!==0?'':(typeof v=='object'?JSON.stringify(v)||'':''+v)).replace(/</g,'&lt;');},
     '&': function(v){return encodeURIComponent(!v&&v!==0?'':''+v);}
   },
@@ -148,7 +148,7 @@ var ltl = this.ltl = this.ltl || {
     if (settings.enableDebug && !settings.space) {
       settings.space = '  ';
     }
-    var getPattern = /s\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
+    var getPattern = /state\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
 
     if (settings.space) {
       settings.space = ltl.escapeBlock(settings.space);
@@ -248,10 +248,10 @@ var ltl = this.ltl = this.ltl || {
       // If we're in a "call" block, call another template with compiled parts.
       if (blockFilter == 'call') {
         // If there's a key, pass a sub-state.
-        // * With a sub-state: this['VIEW'].call((s['KEY']._='KEY')&&s['KEY'])
-        // * Without sub-state: this['VIEW'].call(s)
+        // * With a sub-state: this['VIEW'].call((state['KEY']._='KEY')&&state['KEY'])
+        // * Without sub-state: this['VIEW'].call(state)
         var key = ltl.trim(blockContent || '');
-        var state = key ? "s['" + key + "']" : 's';
+        var state = key ? "state['" + key + "']" : 'state';
         appendText('html',
           "'+this['" + blockName + "'].call(this," + state +
           (text ? ',' + ltl.compile(text, blockOptions) : '') + ")+'");
@@ -389,9 +389,9 @@ var ltl = this.ltl = this.ltl || {
           var l = ltl.vars[varIndex++];
           var e = ltl.vars[varIndex++];
           loopVars.push([[item, e]]);
-          return 'for(var ' + e + ',' + i + '=0,' + l + '=s.' + array + '.length;' +
+          return 'for(var ' + e + ',' + i + '=0,' + l + '=state.' + array + '.length;' +
             i + '<' + l + ';++' + i + ')' +
-            '{' + e + '=s.' + array + '[' + i + ']' + ';';
+            '{' + e + '=state.' + array + '[' + i + ']' + ';';
         });
       if (found) {
         stack.push('for');
@@ -404,9 +404,9 @@ var ltl = this.ltl = this.ltl || {
           var k = ltl.vars[varIndex++];
           var v = ltl.vars[varIndex++];
           loopVars.push([[key, k], [value, v]]);
-          return 'for(var ' + k + ' in s.' + object + ')' +
-            '{if(!s.' + object + '.hasOwnProperty(' + k + '))continue;' +
-            v + '=s.' + object + '[' + k + ']' + ';';
+          return 'for(var ' + k + ' in state.' + object + ')' +
+            '{if(!state.' + object + '.hasOwnProperty(' + k + '))continue;' +
+            v + '=state.' + object + '[' + k + ']' + ';';
         });
 
       if (found) {
@@ -425,7 +425,7 @@ var ltl = this.ltl = this.ltl || {
     }
 
     /**
-     * Give scope to a JavaScript expression by prepending the state variable "s".
+     * Give scope to a JavaScript expression by prepending the state variable "state".
      * TODO: Parse using acorn so that strings can't be interpreted as ltl.vars.
      */
     function prependState(code, unescapeSingleQuotes) {
@@ -455,7 +455,7 @@ var ltl = this.ltl = this.ltl || {
                 }
               }
               if (!isProperty && !isLoopVar) {
-                tokens[i] = 's.' + token;
+                tokens[i] = 'state.' + token;
               }
             }
           }
@@ -464,30 +464,24 @@ var ltl = this.ltl = this.ltl || {
         }
       }
       code = tokens.join('');
-      getPattern = /s\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
+      getPattern = /state\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
       code = code.replace(getPattern, function (match, part) {
         hasGets = true;
-        return "p['" + part + "'].call(this,s)";
+        return "p['" + part + "'].call(this,state)";
       });
       return code;
     }
 
     /**
-     * Find ={...}, ${...}, &{...}, and -{...} interpolations.
+     * Find ={...}, ${...} and &{...} interpolations.
      * Turn them into state-aware insertions unless escaped.
      */
     function interpolate(code) {
-      return code.replace(/(\\?)([$=&-])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
+      return code.replace(/(\\?)([$=&])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
         if (backslash) {
           return symbol + '{' + expression + '}';
         }
-        if (symbol == '-') {
-          if (!escapeCommentVar) {
-            escapeCommentVar = ltl.vars[varIndex++];
-          }
-          return "'+" + escapeCommentVar + '(' + prependState(expression, true) + ")+'";
-        }
-        else if (symbol == '$') {
+        if (symbol == '$') {
           if (!escapeHtmlVar) {
             escapeHtmlVar = ltl.vars[varIndex++];
           }
@@ -584,7 +578,7 @@ var ltl = this.ltl = this.ltl || {
         var pair = blockName.split(':');
         blockName = pair[0];
         if (command == 'get') {
-          appendText('html', "'+" + "p['" + blockName + "'].call(this,s)+'");
+          appendText('html', "'+" + "p['" + blockName + "'].call(this,state)+'");
           hasGets = true;
         }
         else {
@@ -891,9 +885,9 @@ var ltl = this.ltl = this.ltl || {
         ltl.cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';') + output;
     }
     if (hasAssignments) {
-      output = 's=s||{};' + output;
+      output = 'state=state||{};' + output;
     }
-    output = 'function(s' + (hasGets ? ',p' : '') + '){' + output + '}';
+    output = 'function(state' + (hasGets ? ',p' : '') + '){' + output + '}';
 
     // Evaluate the template as a function.
     name = settings.name;

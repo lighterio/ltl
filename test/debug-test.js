@@ -4,14 +4,14 @@ describe('Debug', function () {
 
   it('adds whitespace to html', function () {
     var disabled = ltl.compile('p\n br', {enableDebug: false}).toString();
-    is(disabled, "function (s){var o='<p><br></p>';return o}");
+    is(disabled, "function (state){var o='<p><br></p>';return o}");
     var enabled = ltl.compile('p\n br', {enableDebug: true}).toString();
-    is(enabled, "function (s){var o='<p>\\n  <br>\\n</p>';return o}");
+    is(enabled, "function (state){var o='<p>\\n  <br>\\n</p>';return o}");
   });
 
   it('adds whitespace to JS', function () {
     var template = ltl.compile('br\nif a\n for i in x\n  i Hi', {enableDebug: true});
-    is(template.toString(), "function (s){var o='<br>';if(s.a){for(var c,a=0,b=s.x.length;a<b;++a){c=s.x[a];o+='\\n<i>Hi</i>'}}return o}");
+    is(template.toString(), "function (state){var o='<br>';if(state.a){for(var c,a=0,b=state.x.length;a<b;++a){c=state.x[a];o+='\\n<i>Hi</i>'}}return o}");
   });
 
   it('throws an error if not enabled', function (done) {

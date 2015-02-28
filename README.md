@@ -425,12 +425,12 @@ less
   a {color: #000;}
 
 coffee
-  s.linkText = 'hello'
+  state.linkText = 'hello'
 
 a ${linkText}
 ```
 
-The state variable in a template is called `s`, so the above would set the
+The state variable in a template is called `state`, so the above would set the
 `linkText` value in the state object, and then it would render the following
 HTML if called:
 ```html
