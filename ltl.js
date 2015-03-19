@@ -180,7 +180,7 @@ var ltl = this.ltl = this.ltl || {
     var hasContent = false;
     var tagDepth = 0;
 
-    var output = "var o='";
+    var output = "var output='";
 
     var varIndex = 0;
     var escapeHtmlVar = false;
@@ -214,7 +214,7 @@ var ltl = this.ltl = this.ltl || {
           output += "'" + (text == '}' ? '' : ';');
         }
         else {
-          output += "o+='";
+          output += "output+='";
         }
         mode = textMode;
       }
@@ -862,7 +862,7 @@ var ltl = this.ltl = this.ltl || {
     backtrackIndent();
 
     // Add the return statement (ending concatenation, where applicable).
-    appendText('script', 'return o');
+    appendText('script', 'return output');
 
     if (blockSets) {
       return '{' + blockSets.join(',') + '}';
