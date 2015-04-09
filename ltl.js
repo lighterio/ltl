@@ -24,7 +24,7 @@ var ltl = this.ltl = this.ltl || {
 
   // JavaScript tokens that don't need the state "state" prepended for interpolation.
   // TODO: Flesh out this list?
-  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|this|Math|Object|Date|Error|RegExp|JSON)$/,
+  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|this|Math|Object|Date|Error|RegExp|JSON|Jymin)$/,
 
   // Stores available single character variable names.
   vars: 'abcdefghijklmnqrtuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
