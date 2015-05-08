@@ -265,15 +265,20 @@ ul
 <ul><li>IPA</li><li>Porter</li><li>Stout</li></ul>
 ```
 
-Use `for..of` to iterate over an object's keys.
+Use `for..of` to iterate over object keys.
 
 *State:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
-```jade
+```
 for drink, activity of pairings
-  . ${field} is for ${value}.
+  .
+    b \\${field}
+    space
+    : is for
+    space
+    i \\${value}.
 ```
 ```html
-<div>Coffee is for coding.</div><div>Beer is for bloviating</div>
+<div><b>Coffee</b> is for <i>coding</i>.</div><div><b>Beer</b> is for <i>bloviating</i>.</div>
 ```
 
 ### Conditionals
