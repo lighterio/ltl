@@ -26,10 +26,12 @@ describe('Assigment', function () {
     is(result, '<p>x</p>');
   });
 
+  /*
   it('works with empty states', function () {
     var template = ltl.compile('x = 1\np ={x}');
     var result = template();
     is(result, '<p>1</p>');
   });
+  */
 
 });

@@ -8,7 +8,7 @@ var ltl = this.ltl = this.ltl || {
   scope: this,
 
   // Allow users to see what version of Ltl they're using.
-  version: '0.2.0',
+  version: '1.0.0',
 
   // Some HTML tags won't have end tags.
   selfClosePattern: /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/|space|js|css)(\b|$)/,
@@ -16,15 +16,15 @@ var ltl = this.ltl = this.ltl || {
   // Supported control keywords (usage appears like tags).
   controlPattern: /^(for|if|else)\b/,
 
-  // Pattern for a Jasignment.
+  // Pattern for assignment.
   assignmentPattern: /^([$A-Za-z_][$A-Za-z_0-9\.\[\]'"]*\s*=[^\{])/,
 
   // Supported command keywords.
   commandPattern: /^(call|get|set)\b/,
 
-  // JavaScript tokens that don't need the state "state" prepended for interpolation.
+  // JavaScript tokens that don't need the scope "scope" prepended for interpolation.
   // TODO: Flesh out this list?
-  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|this|Math|Object|Date|Error|RegExp|JSON|Jymin)$/,
+  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|this|typeof|Math|Object|Date|Error|RegExp|JSON|Jymin|scope|state)$/,
 
   // Stores available single character variable names.
   vars: 'abcdefghijklmnqrtuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -110,22 +110,16 @@ var ltl = this.ltl = this.ltl || {
     '&': function(v){return encodeURIComponent(!v&&v!==0?'':''+v);}
   },
 
-  // Last value of an auto-incremented ID.
-  lastId: 0,
-
   // Store filter modules, such as "coffee-script" and "marked".
   filters: {
     js: 'js',
     css: 'css'
   },
 
-  // Store tags that evaluate elsewhere.
-  tags: {},
-
   // Default compile settings.
   options: {
     tabWidth: 4,
-    enableDebug: false
+    defaultTag: 'div'
   },
 
   // Change compile options.
@@ -133,22 +127,18 @@ var ltl = this.ltl = this.ltl || {
     this.options[name] = value;
   },
 
-  // Create a function that accepts state and returns markup.
+  // Create a function that accepts scope and returns markup.
   compile: function (code, options) {
 
     // Copy the default options.
     var settings = {
       tabWidth: this.options.tabWidth,
-      space: this.options.space,
-      enableDebug: this.options.enableDebug
+      defaultTag: this.options.defaultTag,
+      space: this.options.space
     };
     for (var name in options) {
       settings[name] = options[name];
     }
-    if (settings.enableDebug && !settings.space) {
-      settings.space = '  ';
-    }
-    var getPattern = /state\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
 
     if (settings.space) {
       settings.space = ltl.escapeBlock(settings.space);
@@ -195,8 +185,8 @@ var ltl = this.ltl = this.ltl || {
     var blockTag = null;
     var blockName = '';
     var blockContent = '';
-    var blockSets = null;
-    var hasGets = false;
+    var blockScope = null;
+    var hasBlocks = false;
     var inComment = false;
 
     // Support adding properties like "js" to the template function.
@@ -247,25 +237,17 @@ var ltl = this.ltl = this.ltl || {
 
       // If we're in a "call" block, call another template with compiled parts.
       if (blockFilter == 'call') {
-        // If there's a key, pass a sub-state.
-        // * With a sub-state: this['VIEW'].call((state['KEY']._='KEY')&&state['KEY'])
-        // * Without sub-state: this['VIEW'].call(state)
-        var key = ltl.trim(blockContent || '');
-        var state = key ? "state['" + key + "']" : 'state';
-        appendText('html',
-          "'+this['" + blockName + "'].call(this," + state +
-          (text ? ',' + ltl.compile(text, blockOptions) : '') + ")+'");
-        return;
-      }
-      // For a "set" block, add to the array of "set" block values.
-      else if (blockFilter == 'set' || blockFilter == 'set:') {
-        var block;
-        if (blockFilter == 'set') {
-          block = ltl.compile(text, blockOptions).toString();
-        } else {
-          block = "function(){return '" + ltl.escapeBlock(text) + "'}";
+        if (/\S/.test(text)) {
+          blockScope = blockScope || [];
+          var blockJs = ltl.compile(text, blockOptions).toString();
+          blockJs = blockJs.replace(/^.*?\)/, 'function()');
+          blockScope.push('block:' + blockJs);
+          hasBlocks = true;
         }
-        (blockSets = blockSets || []).push("'" + ltl.escapeSingleQuotes(blockName) + "':" + block);
+        blockScope = blockScope ? blockScope.join(',') : '';
+        appendText('html',
+          "'+this['" + blockName + "'].call(this,{" + blockScope + "},state||scope)+'");
+        blockScope = null;
         return;
       }
       // If there's a filter, get its module.
@@ -342,6 +324,7 @@ var ltl = this.ltl = this.ltl || {
       blockFilter = null;
       blockProperty = null;
       blockTarget = null;
+      blockScope = null;
     }
 
     function backtrackIndent() {
@@ -389,9 +372,9 @@ var ltl = this.ltl = this.ltl || {
           var l = ltl.vars[varIndex++];
           var e = ltl.vars[varIndex++];
           loopVars.push([[item, e]]);
-          return 'for(var ' + e + ',' + i + '=0,' + l + '=state.' + array + '.length;' +
+          return 'for(var ' + e + ',' + i + '=0,' + l + '=scope.' + array + '.length;' +
             i + '<' + l + ';++' + i + ')' +
-            '{' + e + '=state.' + array + '[' + i + ']' + ';';
+            '{' + e + '=scope.' + array + '[' + i + ']' + ';';
         });
       if (found) {
         stack.push('for');
@@ -404,9 +387,9 @@ var ltl = this.ltl = this.ltl || {
           var k = ltl.vars[varIndex++];
           var v = ltl.vars[varIndex++];
           loopVars.push([[key, k], [value, v]]);
-          return 'for(var ' + k + ' in state.' + object + ')' +
-            '{if(!state.' + object + '.hasOwnProperty(' + k + '))continue;' +
-            v + '=state.' + object + '[' + k + ']' + ';';
+          return 'for(var ' + k + ' in scope.' + object + ')' +
+            '{if(!scope.' + object + '.hasOwnProperty(' + k + '))continue;' +
+            v + '=scope.' + object + '[' + k + ']' + ';';
         });
 
       if (found) {
@@ -425,7 +408,7 @@ var ltl = this.ltl = this.ltl || {
     }
 
     /**
-     * Give scope to a JavaScript expression by prepending the state variable "state".
+     * Give scope to a JavaScript expression by prepending the scope variable "scope".
      * TODO: Parse using acorn so that strings can't be interpreted as ltl.vars.
      */
     function prependState(code, unescapeSingleQuotes) {
@@ -455,7 +438,7 @@ var ltl = this.ltl = this.ltl || {
                 }
               }
               if (!isProperty && !isLoopVar) {
-                tokens[i] = 'state.' + token;
+                tokens[i] = 'scope.' + token;
               }
             }
           }
@@ -464,37 +447,38 @@ var ltl = this.ltl = this.ltl || {
         }
       }
       code = tokens.join('');
-      getPattern = /state\.get\.([$A-Za-z_][$A-Za-z_\d]*)/g;
-      code = code.replace(getPattern, function (match, part) {
-        hasGets = true;
-        return "p['" + part + "'].call(this,state)";
-      });
       return code;
     }
 
     /**
      * Find ={...}, ${...} and &{...} interpolations.
-     * Turn them into state-aware insertions unless escaped.
+     * Turn them into scope-aware insertions unless escaped.
      */
     function interpolate(code) {
       return code.replace(/(\\?)([$=&])\{([^\}]+)\}/g, function(match, backslash, symbol, expression) {
         if (backslash) {
           return symbol + '{' + expression + '}';
         }
+        if (expression == 'block') {
+          expression = 'scope.block.call(this,scope)';
+        }
+        else {
+          expression = prependState(expression, true);
+        }
         if (symbol == '$') {
           if (!escapeHtmlVar) {
             escapeHtmlVar = ltl.vars[varIndex++];
           }
-          return "'+" + escapeHtmlVar + '(' + prependState(expression, true) + ")+'";
+          return "'+" + escapeHtmlVar + '(' + expression + ")+'";
         }
         else if (symbol == '&') {
           if (!encodeUriVar) {
             encodeUriVar = ltl.vars[varIndex++];
           }
-          return "'+" + encodeUriVar + '(' + prependState(expression, true) + ")+'";
+          return "'+" + encodeUriVar + '(' + expression + ")+'";
         }
         else {
-          return "'+" + prependState(expression, true) + "+'";
+          return "'+" + expression + "+'";
         }
       });
     }
@@ -570,23 +554,19 @@ var ltl = this.ltl = this.ltl || {
       }
 
       // Expression patterns make things append.
-      else if (ltl.commandPattern.test(line)) {
-        var data = ltl.trim(line).split(/\s+/);
-        var command = data.shift();
-        blockName = data.shift();
-        blockContent = data.join(' ');
-        var pair = blockName.split(':');
-        blockName = pair[0];
-        if (command == 'get') {
-          appendText('html', "'+" + "p['" + blockName + "'].call(this,state)+'");
-          hasGets = true;
-        }
-        else {
-          if (pair[1] === '') {
-            command += ':';
+      else if (line[0] == '@') {
+        line.replace(/@([^\s\(\[]+)([\(\[][^\)\]]*[\)\]])?(.*)/, function (match, path, attributes, rest) {
+          blockName = path;
+          blockContent = rest;
+          if (attributes) {
+            blockScope = [];
+            attributes = attributes.substr(1, attributes.length - 2);
+            attributes.replace(/([^\s]+?)(=(['"])?[^'"]*?\3)?(\s|$)/g, function (match, name, value, space) {
+              blockScope.push(name + ':' + (value ? prependState(value.substr(1)) : true));
+            });
           }
-          startBlock(command, blockContent);
-        }
+          startBlock('call', blockContent);
+        });
       }
 
       // Tags must be parsed for id/class/attributes/content.
@@ -624,7 +604,7 @@ var ltl = this.ltl = this.ltl || {
             }
 
             // If it's the beginning of a list of attributes, iterate through them.
-            else if (character == '(') {
+            else if (character == '(' || character == '[') {
 
               // Move on from the parentheses.
               rest = rest.substring(1);
@@ -634,7 +614,7 @@ var ltl = this.ltl = this.ltl || {
               while (rest && (++t < maxT)) {
 
                 // Find quoted attributes or the end of the list.
-                end = rest.search(/[\)"']/);
+                end = rest.search(/[\)\]"']/);
 
                 // If there's no end, read what's left as attributes.
                 if (end < 0) {
@@ -645,7 +625,7 @@ var ltl = this.ltl = this.ltl || {
                 character = rest[end];
 
                 // If it's the end, get any remaining attribute and get out.
-                if (character == ')') {
+                if (character == ')' || character == ']') {
                   attributes += rest.substring(0, end);
                   rest = rest.substring(end + 1);
                   break;
@@ -697,41 +677,6 @@ var ltl = this.ltl = this.ltl || {
               break;
             }
 
-            // If the next character is an "at" symbol, create event listener references.
-            else if (character == '@') {
-              rest = rest.replace(/^@([$a-z0-9_~@]*)/i, function (match, events) {
-                autoClass = autoClass || '_ltl' + (++ltl.lastId);
-                classes.push(autoClass);
-                var bind = bindings[autoClass] = bindings[autoClass] || {};
-                events = events.split('@');
-                for (var e = 0; e < events.length; e++) {
-                  var listeners = events[e].split('~');
-                  var eventName = listeners.shift();
-                  var listen = bind[eventName] = bind[eventName] || [];
-                  for (var l = 0; l < listeners.length; l++) {
-                    listen.push(listeners[l]);
-                  }
-                }
-              });
-            }
-
-            // If the next character is a tilde, it's an event listener or language.
-            else if (character == '~') {
-              rest.replace(/^(~[^:\s]+):?(\S*)\s?(.*)$/, function (match, name, filter, content) {
-                var target = ltl.languages[name];
-                if (target) {
-                  eventLanguage = name;
-                }
-                else {
-                  blockProperty = name;
-                  blockTag = '';
-                  startBlock(filter || eventLanguage, content);
-                }
-              });
-              rest = '';
-              break;
-            }
-
             // If the next character is a space, it's the start of content.
             else if (character == ' ') {
               content = ltl.trim(rest);
@@ -769,7 +714,7 @@ var ltl = this.ltl = this.ltl || {
             if (!tag) {
               var useDefault = (blockTag === null) || id || className || attributes;
               if (useDefault) {
-                tag = blockTag = 'div';
+                tag = blockTag = settings.defaultTag;
               }
             }
 
@@ -805,7 +750,7 @@ var ltl = this.ltl = this.ltl || {
 
             html = ltl.escapeSingleQuotes(html);
             if (tag == 'html') {
-              // If there's an HTML tag, don't wrap with a state.
+              // If there's an HTML tag, don't wrap with a scope.
               hasHtmlTag = true;
               if (!/DOCTYPE/.test(output)) {
                 html = '<!DOCTYPE html>' + (settings.space ? '\\n' : '') + html;
@@ -864,10 +809,6 @@ var ltl = this.ltl = this.ltl || {
     // Add the return statement (ending concatenation, where applicable).
     appendText('script', 'return output');
 
-    if (blockSets) {
-      return '{' + blockSets.join(',') + '}';
-    }
-
     // Create the function.
     if (escapeCommentVar) {
       output = (settings.name ?
@@ -884,10 +825,10 @@ var ltl = this.ltl = this.ltl || {
         'var ' + encodeUriVar + "=this['&'];" :
         ltl.cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';') + output;
     }
-    if (hasAssignments) {
-      output = 'state=state||{};' + output;
+    if (hasBlocks) {
+      output = 'state=state||scope;' + output;
     }
-    output = 'function(state' + (hasGets ? ',p' : '') + '){' + output + '}';
+    output = 'function(scope,state){' + output + '}';
 
     // Evaluate the template as a function.
     name = settings.name;
@@ -908,26 +849,9 @@ var ltl = this.ltl = this.ltl || {
       template.cache = ltl.cache;
     }
 
-    // Add event bindings to the JS property.
-    for (var key in bindings) {
-      var events = bindings[key];
-      for (var event in events) {
-        var listeners = events[event];
-        for (var i = 0; i < listeners.length; i++) {
-          var listener = listeners[i];
-          var js = properties['~' + listener];
-          properties.js = properties.js ? properties.js + '\n' : '';
-          properties.js += 'Jymin.on(".' + key + '","' + event + '",' +
-            'function(element,event,target){' + js + '});';
-        }
-      }
-    }
-
     // Add any discovered properties to the template.
     for (name in properties) {
-      if (name[0] != '~') {
-        template[name] = template[name] || properties[name];
-      }
+      template[name] = template[name] || properties[name];
     }
 
     return template;

@@ -3,13 +3,13 @@ var ltl = require('../ltl');
 describe('Inline JS', function () {
 
   it('works with a js tag', function () {
-    var template = ltl.compile('js\n state.a = 1;\n: ${a}');
+    var template = ltl.compile('js\n scope.a = 1;\n: ${a}');
     var result = template({});
     is(result, '1');
   });
 
   it('works with a coffee tag', function () {
-    var template = ltl.compile('coffee\n state.a = 1\n: ${a}');
+    var template = ltl.compile('coffee\n scope.a = 1\n: ${a}');
     var result = template({});
     is(result, '1');
   });
