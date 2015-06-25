@@ -1,45 +1,45 @@
-var ltl = require('../ltl');
+var ltl = require('../ltl')
 
 after(function () {
-  delete process.ltl;
-  delete global.window;
-});
+  delete process.ltl
+  delete global.window
+})
 
 describe('API', function () {
 
   describe('ltl', function () {
     it('is an object', function () {
-      is.object(ltl);
-    });
-  });
+      is.object(ltl)
+    })
+  })
 
   describe('ltl.version', function () {
     it('exposes the module version', function () {
-      is.in(ltl.version, /^[0-9]+\.[0-9]+\.[0-9]+$/);
-      var pkg = require('../package.json');
-      is(pkg.version, ltl.version);
-    });
-  });
+      is.in(ltl.version, /^[0-9]+\.[0-9]+\.[0-9]+$/)
+      var pkg = require('../package.json')
+      is(pkg.version, ltl.version)
+    })
+  })
 
   describe('ltl.setOption("space", string)', function () {
     it('modifies the space variable', function () {
-      ltl.setOption('space', '\t');
-      var result = ltl.compile('.\n p hi')();
-      is(result, '<div>\n\t<p>hi</p>\n</div>');
-      delete ltl.options.space;
-    });
-  });
+      ltl.setOption('space', '\t')
+      var result = ltl.compile('.\n p hi')()
+      is(result, '<div>\n\t<p>hi</p>\n</div>')
+      delete ltl.options.space
+    })
+  })
 
   describe('ltl.compile', function () {
     it('is a function', function () {
-      is.function(ltl.compile);
-    });
-  });
+      is.function(ltl.compile)
+    })
+  })
 
   describe('ltl.compile(string)', function () {
     it('returns a template function', function () {
-      is.function(ltl.compile(''));
-    });
-  });
+      is.function(ltl.compile(''))
+    })
+  })
 
-});
+})

@@ -1,10 +1,10 @@
-var ltl = require('../ltl');
-var jade = require('jade');
-var dot = require('dot');
+var ltl = require('../ltl')
+var jade = require('jade')
+var dot = require('dot')
 
 describe('Message and 10-item list', function () {
 
-  var templates = {};
+  var templates = {}
 
   bench('compiling', function () {
 
@@ -17,8 +17,8 @@ describe('Message and 10-item list', function () {
         '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: ={message}\n' +
         '  ul\n' +
         '   for item in items\n' +
-        '    li ={item}');
-    });
+        '    li ={item}')
+    })
 
     it('doT', function () {
       templates.doT = dot.compile(
@@ -26,8 +26,8 @@ describe('Message and 10-item list', function () {
         '<body><div id="hey" class="a b" style="display:block;width:100px">' +
         'Here\'s my message: {{=it.message}}</div><ul>{{' +
         'var a=it.items;for(var i=0,l=a.length;i<a.length;++i){ }}' +
-        '<li>{{=a[i]}}</li>{{ } }}</ul></body></html>');
-    });
+        '<li>{{=a[i]}}</li>{{ } }}</ul></body></html>')
+    })
 
     it('Jade', function () {
       templates.Jade = jade.compile(
@@ -39,8 +39,30 @@ describe('Message and 10-item list', function () {
         '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
         '  ul\n' +
         '   each item in items\n' +
-        '    li #{item}');
-    });
+        '    li #{item}')
+    })
+
+    var i = 0
+    after(function () {
+      if (!i++) {
+        //alert(templates.Ltl.toString())
+        //alert(templates.doT.toString())
+        //alert(templates.Jade.toString())
+
+        var t = templates.Ltl.toString().replace(/^.*?\{(.*)\}$/, '$1')
+        t = t.replace(/scope/g, 's')
+        t = t.replace(/ltl0/g, 'a')
+        t = t.replace(/ltl1/g, 'b')
+        t = t.replace(/ltl2/g, 'c')
+        t = t.replace(/output/g, 'o')
+        t = t.replace(/o+='([^']*)';return o/, "return o+'$1'")
+        templates.F = new Function('s', t)
+        //alert(templates.F.toString())
+        eval("eval.G=function(s){var o='<!DOCTYPE html><html><head><title>Hello World</title></head><body><div id=\"hey\" class=\"a b\" style=\"display:block; width:100px\">Here\\'s my message: '+s.message+'</div><ul>';for(var a=0,b=s.items,c=b.length;a<c;++a){o+='<li>'+b[a]+'</li>'}return o+'</ul></body></html>'}")
+        templates.G = eval.G
+        //alert(templates.G.toString())
+      }
+    })
 
     /*
     it('JSX', function () {
@@ -51,31 +73,41 @@ describe('Message and 10-item list', function () {
         'for(var i=0;i<object.items.length;++i){\n' +
         '<li>{object.items[i]}</li>\n' +
         '}\n' +
-        '</ul></body></html>');
-    });
+        '</ul></body></html>')
+    })
     */
 
-  });
+  })
 
   bench('rendering', function () {
 
     var state = {
       message: 'hello',
       items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']
-    };
+    }
 
     it('Ltl', function () {
-      templates.Ltl(state);
-    });
+      templates.Ltl(state)
+    })
 
     it('doT', function () {
-      templates.doT(state);
-    });
+      templates.doT(state)
+    })
 
     it('Jade', function () {
-      templates.Jade(state);
-    });
+      templates.Jade(state)
+    })
 
-  });
+    /*
+    it('F', function () {
+      templates.F(state)
+    })
 
-});
+    it('G', function () {
+      templates.G(state)
+    })
+    */
+
+  })
+
+})
