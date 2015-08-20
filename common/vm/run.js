@@ -38,7 +38,7 @@ var run = module.exports = function (code, path, context) {
 var env = process.env.NODE_ENV || ''
 if (env[0] !== 'd') {
   run = module.exports = function (code) {
-    eval('eval.o=' + code.replace(/\[\]/g, 'new Array()'))
+    eval('var window={};eval.o=' + code.replace(/\[\]/g, 'new Array()'))
     return eval.o
   }
 }

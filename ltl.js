@@ -102,8 +102,12 @@ var ltl = this.ltl = this.ltl || {
   // Store templates that have been compiled.
   // Include 2 built-ins for interpolation.
   cache: {
-    '$': function(v){return (!v&&v!==0?'':(typeof v=='object'?JSON.stringify(v)||'':''+v)).replace(/</g,'&lt;');},
-    '&': function(v){return encodeURIComponent(!v&&v!==0?'':''+v);}
+    '$': function (v) {
+      return (!v && v !== 0 ? '' : (typeof v === 'object' ? JSON.stringify(v) || '' : '' + v)).replace(/</g, '&lt;')
+    },
+    '&': function (v) {
+      return encodeURIComponent(!v && v !== 0 ? '' : '' + v)
+    }
   },
 
   // Store filter modules, such as "coffee-script" and "marked".
@@ -242,7 +246,7 @@ var ltl = this.ltl = this.ltl || {
           blockScope.push('block:' + blockJs)
         }
         blockScope = blockScope ? blockScope.join(',') : ''
-        appendText('html', "'+cache['" + blockName + "'].call(cache,{" + blockScope + "},state)+'")
+        appendText('html', "'+cache['" + blockName + "']({" + blockScope + "},state)+'")
         useCache = true
         blockScope = null
         return
@@ -461,7 +465,7 @@ var ltl = this.ltl = this.ltl || {
           }
           return "'+" + encodeUriVar + '(' + expression + ")+'"
         } else {
-          return "'+" + expression + "+'"
+          return "'+(" + expression + ")+'"
         }
       })
     }
