@@ -6,7 +6,7 @@
   "devDependencies": {
     "coffee-script": "1.9.0",
     "dot": "^1.0.3",
-    "exam": "^1.0.0",
+    "exam": "git+https://github.com/zerious/exam.git",
     "jade": "^1.9.2",
     "jsx": "^0.9.89",
     "less": "^2.4.0",
