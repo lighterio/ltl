@@ -1,12 +1,12 @@
 {
   "name": "ltl",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Lean Template Language for JavaScript and HTML",
   "dependencies": {},
   "devDependencies": {
     "coffee-script": "1.9.0",
     "dot": "^1.0.3",
-    "exam": "git+https://github.com/zerious/exam.git",
+    "exam": "0.3.0",
     "jade": "^1.9.2",
     "jsx": "^0.9.89",
     "less": "^2.4.0",
