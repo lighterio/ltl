@@ -46,4 +46,19 @@ describe('Control', function () {
 
   })
 
+  describe('break', function () {
+
+    it('adds a break statement', function () {
+      var template = ltl.compile('if a\n a\nelse if b\n b\nelse\n i')
+      var result
+      result = template({a: true, b: false})
+      is(result, '<a></a>')
+      result = template({a: false, b: true})
+      is(result, '<b></b>')
+      result = template({a: false, b: false})
+      is(result, '<i></i>')
+    })
+
+  })
+
 })

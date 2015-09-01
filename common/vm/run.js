@@ -28,6 +28,7 @@ var run = module.exports = function (code, path, context) {
   try {
     vm.runInNewContext(src, context, key)
   } catch (e) {
+    console.log('WTF')
     e.message += '\n' + src + '\n' + (e instanceof SyntaxError)
     throw e
   }

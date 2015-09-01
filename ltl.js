@@ -8,13 +8,13 @@ var ltl = this.ltl = this.ltl || {
   scope: this,
 
   // Allow users to see what version of Ltl they're using.
-  version: '1.0.0',
+  version: '0.3.1',
 
   // Some HTML tags won't have end tags.
   selfClosePattern: /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/|space|js|css)(\b|$)/,
 
   // Supported control keywords (usage appears like tags).
-  controlPattern: /^(for|if|else)\b/,
+  controlPattern: /^(for|if|else|break|continue)\b/,
 
   // Pattern for assignment.
   assignmentPattern: /^([$A-Za-z_][$A-Za-z_0-9\.\[\]'"]*\s*=[^\{])/,
@@ -393,8 +393,18 @@ var ltl = this.ltl = this.ltl || {
           return keyword + (condition ? '(' + scopify(condition) + ')' : '') + '{' + newLine
         })
 
-      stack.push('if')
-      return script
+      if (found) {
+        stack.push('if')
+        return script
+      }
+
+      /*
+      script = script.replace(/^(break|continue)(\s+.*)$/i,
+        function (match, keyword, condition) {
+          found = true
+          return keyword + (condition ? '(' + scopify(condition) + ')' : '') + '{' + newLine
+        })
+      */
     }
 
     /**
