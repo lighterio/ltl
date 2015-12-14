@@ -270,7 +270,7 @@ Use `for..of` to iterate over an object's keys.
 *State:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
 ```jade
 for drink, activity of pairings
-  . ${field} is for ${value}.
+  . ${drink} is for ${activity}.
 ```
 ```html
 <div>Coffee is for coding.</div><div>Beer is for bloviating</div>
