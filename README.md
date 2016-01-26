@@ -265,7 +265,7 @@ ul
 <ul><li>IPA</li><li>Porter</li><li>Stout</li></ul>
 ```
 
-Use `for..of` to iterate over an object's keys.
+Use `for..of` to iterate over object keys.
 
 *State:* `{pairings: {Coffee: 'coding', Beer: 'bloviating'}}`
 ```jade
@@ -273,7 +273,7 @@ for drink, activity of pairings
   . ${drink} is for ${activity}.
 ```
 ```html
-<div>Coffee is for coding.</div><div>Beer is for bloviating</div>
+<div><b>Coffee</b> is for <i>coding</i>.</div><div><b>Beer</b> is for <i>bloviating</i>.</div>
 ```
 
 ### Conditionals
@@ -299,12 +299,12 @@ if Math.random() > 0.5
 
 ### Calling templates within templates
 
-A template can call another template with `call`. To accomplish
+A template can call another template with `@`. To accomplish
 this, you must compile your templates with `options.name`, and
 they will be stored in `ltl.cache`. The template that's being
 called can access the data state.
 ```js
-var temp = ltl.compile('p\n call bold', {name: 'temp'});
+var temp = ltl.compile('p\n @bold', {name: 'temp'});
 var bold = ltl.compile('b ${text}', {name: 'bold'});
 ltl.cache.temp({text: 'Hi!'});
 ```
@@ -312,34 +312,23 @@ ltl.cache.temp({text: 'Hi!'});
 <p><b>Hi!</b></p>
 ```
 
-With `set` and `get`, a template can get content from a
-template that calls it. The calling template declares what
-it will pass using `set` blocks, and the called template
-reads data with `get` blocks.
+Templates can receive data using the attribute syntax, and they can receive a
+nested block of content (if passed), using the builtin scope variable `block`.
 ```js
-var layout = ltl.compile('#nav\n get nav\n#content\n get content', {name: 'layout'});
-var page = ltl.compile('call layout\n set nav\n  . Nav\n set content\n  . Content', {name: 'page'});
+var layout = ltl.compile('html\n head>title ${title}\n body ${block}', {name: 'layout'});
+var page = ltl.compile('@layout(title="Test")\n p It worked!', {name: 'page'});
 ltl.cache.page();
 ```
 ```
-<div id="nav">Nav</div><div id="content">Content</div>
-```
-
-#### Passing sub-states
-
-A template can pass a portion of its state to another template by naming the
-sub-state property after the template name in a call block:
-
-**parent/view.ltl**:
-```jade
-p Expect a state like... {child: {name: "only child"}}
-
-call child/view child
-```
-
-**child/view.ltl**
-```
-p This child is called ${name}.
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test</title>
+  </head>
+  <body>
+    <p>It worked!</div>
+  </body>
+</html>
 ```
 
 ### Template properties
@@ -367,9 +356,6 @@ html
   # Also supports filters
   Properties can have filters. This block will be evaluated as markdown,
   and the resulting value will be set as the "also" property of the template.
-
-// Note:
-  There are several reserved
 ```
 
 ### JS and CSS properties
@@ -394,7 +380,6 @@ In addition, several languages that compile to JS/CSS are supported. Their
 compilers can be invoked using their corresponding file extensions. For
 JS, Ltl supports **coffee**, **litcoffee**, **iced**, **es6**,
 and **ts**. For CSS, it supports **less**, **scss** and **styl**.
-
 
 **coffee-and-less.ltl**:
 ```jade
@@ -425,12 +410,12 @@ less
   a {color: #000;}
 
 coffee
-  s.linkText = 'hello'
+  state.linkText = 'hello'
 
 a ${linkText}
 ```
 
-The state variable in a template is called `s`, so the above would set the
+The state variable in a template is called `state`, so the above would set the
 `linkText` value in the state object, and then it would render the following
 HTML if called:
 ```html
@@ -443,7 +428,7 @@ We would like to thank all of the amazing people who use, support,
 promote, enhance, document, patch, and submit comments & issues.
 Ltl couldn't exist without you.
 
-Additionally, huge thanks go to [TUNE](http://www.tune.com) for employing
+Additionally, huge thanks go to [Goin’](https://goin.io) for employing
 and supporting [Ltl](http://lighter.io/ltl) project maintainers,
 and for being an epically awesome place to work (and play).
 
