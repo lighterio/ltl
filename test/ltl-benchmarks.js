@@ -1,13 +1,13 @@
+'use strict'
+/* global describe it bench after */
 var ltl = require('../ltl')
 var jade = require('jade')
 var dot = require('dot')
 
 describe('Message and 10-item list', function () {
-
   var templates = {}
 
   bench('compiling', function () {
-
     it('Ltl', function () {
       templates.Ltl = ltl.compile(
         'html\n' +
@@ -45,9 +45,9 @@ describe('Message and 10-item list', function () {
     var i = 0
     after(function () {
       if (!i++) {
-        //alert(templates.Ltl.toString())
-        //alert(templates.doT.toString())
-        //alert(templates.Jade.toString())
+        // alert(templates.Ltl.toString())
+        // alert(templates.doT.toString())
+        // alert(templates.Jade.toString())
 
         var t = templates.Ltl.toString().replace(/^.*?\{(.*)\}$/, '$1')
         t = t.replace(/scope/g, 's')
@@ -56,11 +56,6 @@ describe('Message and 10-item list', function () {
         t = t.replace(/ltl2/g, 'c')
         t = t.replace(/output/g, 'o')
         t = t.replace(/o+='([^']*)';return o/, "return o+'$1'")
-        templates.F = new Function('s', t)
-        //alert(templates.F.toString())
-        eval("eval.G=function(s){var o='<!DOCTYPE html><html><head><title>Hello World</title></head><body><div id=\"hey\" class=\"a b\" style=\"display:block; width:100px\">Here\\'s my message: '+s.message+'</div><ul>';for(var a=0,b=s.items,c=b.length;a<c;++a){o+='<li>'+b[a]+'</li>'}return o+'</ul></body></html>'}")
-        templates.G = eval.G
-        //alert(templates.G.toString())
       }
     })
 
@@ -76,11 +71,9 @@ describe('Message and 10-item list', function () {
         '</ul></body></html>')
     })
     */
-
   })
 
   bench('rendering', function () {
-
     var state = {
       message: 'hello',
       items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']
@@ -97,17 +90,5 @@ describe('Message and 10-item list', function () {
     it('Jade', function () {
       templates.Jade(state)
     })
-
-    /*
-    it('F', function () {
-      templates.F(state)
-    })
-
-    it('G', function () {
-      templates.G(state)
-    })
-    */
-
   })
-
 })

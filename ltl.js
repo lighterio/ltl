@@ -63,41 +63,36 @@ var ltl = this.ltl = this.ltl || {
     var filters = ltl.filters
     var filter = filters[name]
     if (!filter) {
-      filter = filters[name] = ltl.scope[name] || (typeof require !== 'undefined' ? require(name) : null)
+      try {
+        filter = filters[name] = ltl.scope[name] || (typeof require !== 'undefined' ? require(name) : null)
+      } catch (ignore) {
+      }
     }
     if (!filter) {
-      var todo
-      var into = ' into function that accepts a string and returns a string.'
-      if (ltl.scope.cwd) {
-        var cmd = 'cd ' + ltl.scope.cwd() + '; npm install --save ' + name
-        todo = 'Run "' + cmd + '", or make require("ltl").filters.' + name
-      } else {
-        todo = 'Set window.ltl.filters.' + name
-      }
-      throw new Error('[Ltl] Unknown filter: "' + name + '". ' + todo + into)
+      var todo = 'Set window.ltl.filters.' + name + ' to function that accepts a state object and returns a string of HTML.'
+      todo += 'Or run the following:\n  cd ' + process.cwd() + '\n  npm install --save ' + name
+      throw new Error('[Ltl] Unknown filter: "' + name + '". ' + todo)
     }
     return filter
   },
 
   // In browsers and istanbul, run JS with `eval`, otherwise run with `vm`.
-  run: (
-    (typeof require === 'function') ?
-    require('./common/vm/run') :
-    function (src, name) {
-      var f
-      try {
-        eval('f=' + src); // jshint ignore:line
-      } catch (e) {
-        e.message = '[Ltl] ' + e.message
-        if (name) {
-          e.message += '\nTemplate: ' + name
-        }
-        e.message += '\nFunction: ' + src
-        throw e.stack && e
+  run: (typeof require === 'function' && !process.env.running_under_istanbul) ? require('./common/vm/run') : function (src, name) {
+    var f
+    try {
+      /* eslint-disable */
+      eval('f=' + src)
+      /* eslint-enable */
+    } catch (e) {
+      e.message = '[Ltl] ' + e.message
+      if (name) {
+        e.message += '\nTemplate: ' + name
       }
-      return f
+      e.message += '\nFunction: ' + src
+      throw e.stack && e
     }
-  ),
+    return f
+  },
 
   // Store templates that have been compiled.
   // Include 2 built-ins for interpolation.

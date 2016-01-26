@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Blocks', function () {
-
   it('work in the middle', function () {
     var result = ltl.compile('br\nscript:\n var a = 1;\n var b = 2;\nbr')()
     is(result, '<br><script>var a = 1;\nvar b = 2;</script><br>')
@@ -82,6 +83,7 @@ describe('Blocks', function () {
       error = e
     }
     is.truthy(error)
+    is.in(error.message, 'Unknown filter')
   })
 
   it('allow filterless blocks', function () {
@@ -98,5 +100,4 @@ describe('Blocks', function () {
     var result = ltl.compile('p: a\n b')()
     is(result, '<p>a\nb</p>')
   })
-
 })

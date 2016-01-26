@@ -28,7 +28,6 @@ var run = module.exports = function (code, path, context) {
   try {
     vm.runInNewContext(src, context, key)
   } catch (e) {
-    console.log('WTF')
     e.message += '\n' + src + '\n' + (e instanceof SyntaxError)
     throw e
   }
@@ -37,9 +36,11 @@ var run = module.exports = function (code, path, context) {
 
 // Override for production.
 var env = process.env.NODE_ENV || ''
-if (env[0] !== 'd') {
+if (env[0] !== 'd' || process.env.running_under_istanbul) {
   run = module.exports = function (code) {
+    /* eslint-disable */
     eval('var window={};eval.o=' + code.replace(/\[\]/g, 'new Array()'))
+    /* eslint-enable */
     return eval.o
   }
 }

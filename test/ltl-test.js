@@ -1,3 +1,5 @@
+'use strict'
+/* global describe it is after */
 var ltl = require('../ltl')
 
 after(function () {
@@ -6,7 +8,6 @@ after(function () {
 })
 
 describe('API', function () {
-
   describe('ltl', function () {
     it('is an object', function () {
       is.object(ltl)
@@ -41,5 +42,4 @@ describe('API', function () {
       is.function(ltl.compile(''))
     })
   })
-
 })

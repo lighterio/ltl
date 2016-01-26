@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Single quotes', function () {
-
   it('work in content', function () {
     var result = ltl.compile('p I\'m here!')()
     is(result, '<p>I\'m here!</p>')
@@ -42,5 +43,4 @@ describe('Single quotes', function () {
     var result = template({names: ['hi']})
     is(result, '<a name="hi">hi</a>')
   })
-
 })

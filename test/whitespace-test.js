@@ -1,10 +1,11 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 var PBI = '<p><b><i></i></b></p>'
 var PBIT = '<p><b><i>text</i></b></p>'
 
 describe('Whitespace', function () {
-
   it('works with spaces', function () {
     var result
     result = ltl.compile('p\n b\n  i')()
@@ -45,7 +46,7 @@ describe('Whitespace', function () {
   })
 
   it('works with mixed tabs and spaces', function () {
-    ltl.setOption("tabWidth", 2)
+    ltl.setOption('tabWidth', 2)
     var result = ltl.compile('p\n\n\tb\n    i')()
     is(result, PBI)
   })
@@ -73,7 +74,6 @@ describe('Whitespace', function () {
 })
 
 describe('options.space', function () {
-
   it('inserts spaces', function () {
     var result = ltl.compile('p\n b\n  i text\n br\n', {space: '  '})()
     is(result, '<p>\n  <b>\n    <i>text</i>\n  </b>\n  <br>\n</p>')
@@ -113,11 +113,9 @@ describe('options.space', function () {
     var result = ltl.compile('p\n b\n  i text\n br\n', {space: '  '})()
     is(result, '<p>\n  <b>\n    <i>text</i>\n  </b>\n  <br>\n</p>')
   })
-
 })
 
 describe('space tag', function () {
-
   it('inserts a space', function () {
     var result = ltl.compile('space')()
     is(result, ' ')
@@ -152,5 +150,4 @@ describe('space tag', function () {
     var result = ltl.compile('p Hello,\n space\n b ${who}\n : !')({who: 'World'})
     is(result, '<p>Hello, <b>World</b>!</p>')
   })
-
 })

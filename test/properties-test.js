@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Properties', function () {
-
   it('are set', function () {
     var template = ltl.compile('+js\n  var a = 1;')
     var result = template()
@@ -29,5 +30,4 @@ describe('Properties', function () {
     is(result, '')
     is.in(template.js, ';')
   })
-
 })

@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('@', function () {
-
   it('has a cache object', function () {
     is.object(ltl.cache)
   })
@@ -31,5 +32,4 @@ describe('@', function () {
     var result = ltl.cache.temp()
     is(result, '<div><p>A</p></div>')
   })
-
 })
