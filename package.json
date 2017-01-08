@@ -1,17 +1,20 @@
 {
   "name": "ltl",
-  "version": "0.3.1",
-  "description": "Lean Template Language for JavaScript and HTML",
-  "dependencies": {},
+  "version": "0.3.3",
+  "description": "Lean Template Language for JavaScript and HTML.",
+  "dependencies": {
+    "lighter-vm": "1.0.0"
+  },
   "devDependencies": {
     "coffee-script": "1.9.0",
-    "dot": "^1.0.3",
-    "exam": ">=0.3.2",
-    "jade": "^1.9.2",
-    "jsx": "^0.9.89",
-    "less": "^2.4.0",
+    "dot": "1.1.1",
+    "exam": "^1.4.5",
+    "jade": "1.11.0",
+    "jsx": "0.9.89",
+    "less": "2.4.0",
     "markdown": "0.5.0",
-    "marked": "0.3.3"
+    "marked": "0.3.3",
+    "marko": "2.7.21"
   },
   "keywords": [
     "lean",
@@ -25,13 +28,13 @@
   ],
   "main": "ltl",
   "engines": {
-    "node": ">=0.2.6"
+    "node": ">=0.8.28"
   },
   "scripts": {
     "test": "./node_modules/exam/exam.js",
     "cover": "./node_modules/exam/exam-cover.js",
     "report": "open coverage/lcov-report/index.html",
-    "coveralls": "./node_modules/exam/exam-coveralls.js",
+    "bench": "./node_modules/exam/exam.js test/bench",
     "perf": "node perf"
   },
   "repository": "https://github.com/lighterio/ltl.git",
@@ -42,5 +45,5 @@
     "Sam Eubank <sameubank@gmail.com>",
     "Kaushik Shankar <skaushik92@gmail.com>"
   ],
-  "license": "MIT"
+  "license": "ISC"
 }

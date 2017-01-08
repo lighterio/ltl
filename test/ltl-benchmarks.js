@@ -1,6 +1,11 @@
+var fs = require('fs')
 var ltl = require('../ltl')
-var jade = require('jade')
+require('marko/node-require').install()
 var dot = require('dot')
+var jade = require('jade')
+var bench = global.bench || function () {}
+
+var testMarko = 1
 
 describe('Message and 10-item list', function () {
 
@@ -8,22 +13,30 @@ describe('Message and 10-item list', function () {
 
   bench('compiling', function () {
 
+    this.timeout(1e4)
+
     it('Ltl', function () {
       templates.Ltl = ltl.compile(
         'html\n' +
         ' head\n' +
         '  title Hello World\n' +
         ' body\n' +
-        '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: ={message}\n' +
+        '  div#hey.a.b Here\'s my message: ={message}\n' +
         '  ul\n' +
         '   for item in items\n' +
         '    li ={item}')
     })
 
+    it('Marko', function () {
+      var path = __dirname + '/benchmarks/template.marko'
+      templates.Marko = require(path)
+      delete require.cache[path]
+    })
+
     it('doT', function () {
       templates.doT = dot.compile(
         '<!DOCTYPE html><html><head><title>Hello World</title></head>' +
-        '<body><div id="hey" class="a b" style="display:block;width:100px">' +
+        '<body><div id="hey" class="a b">' +
         'Here\'s my message: {{=it.message}}</div><ul>{{' +
         'var a=it.items;for(var i=0,l=a.length;i<a.length;++i){ }}' +
         '<li>{{=a[i]}}</li>{{ } }}</ul></body></html>')
@@ -36,46 +49,11 @@ describe('Message and 10-item list', function () {
         ' head\n' +
         '  title Hello World\n' +
         ' body\n' +
-        '  div#hey.a.b(style="display:block; width:100px") Here\'s my message: #{message}\n' +
+        '  div#hey.a.b Here\'s my message: #{message}\n' +
         '  ul\n' +
         '   each item in items\n' +
         '    li #{item}')
     })
-
-    var i = 0
-    after(function () {
-      if (!i++) {
-        //alert(templates.Ltl.toString())
-        //alert(templates.doT.toString())
-        //alert(templates.Jade.toString())
-
-        var t = templates.Ltl.toString().replace(/^.*?\{(.*)\}$/, '$1')
-        t = t.replace(/scope/g, 's')
-        t = t.replace(/ltl0/g, 'a')
-        t = t.replace(/ltl1/g, 'b')
-        t = t.replace(/ltl2/g, 'c')
-        t = t.replace(/output/g, 'o')
-        t = t.replace(/o+='([^']*)';return o/, "return o+'$1'")
-        templates.F = new Function('s', t)
-        //alert(templates.F.toString())
-        eval("eval.G=function(s){var o='<!DOCTYPE html><html><head><title>Hello World</title></head><body><div id=\"hey\" class=\"a b\" style=\"display:block; width:100px\">Here\\'s my message: '+s.message+'</div><ul>';for(var a=0,b=s.items,c=b.length;a<c;++a){o+='<li>'+b[a]+'</li>'}return o+'</ul></body></html>'}")
-        templates.G = eval.G
-        //alert(templates.G.toString())
-      }
-    })
-
-    /*
-    it('JSX', function () {
-      templates.JSX = require('jsx').compile(
-        '<!DOCTYPE html><html><head><title>Hello World</title></head>' +
-        '<body><div id="hey" class="a b" style="display:block;width:100px">' +
-        'Here\'s my message: {object.message}</div><ul>\n' +
-        'for(var i=0;i<object.items.length;++i){\n' +
-        '<li>{object.items[i]}</li>\n' +
-        '}\n' +
-        '</ul></body></html>')
-    })
-    */
 
   })
 
@@ -86,27 +64,37 @@ describe('Message and 10-item list', function () {
       items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']
     }
 
+    // Localize variables to minimize inner work.
+    var ltl = templates.Ltl
+    var marko = templates.Marko
+    var dot = templates.doT
+    var jade = templates.Jade
+
+    // Make sure the templates output the same content.
+    var html = ltl(state)
+    is(marko.renderSync(state), html)
+    is(dot(state), html)
+    is(jade(state), html)
+
+    // Render the Ltl template.
     it('Ltl', function () {
-      templates.Ltl(state)
+      ltl(state)
     })
 
+    // Render the doT template.
     it('doT', function () {
-      templates.doT(state)
+      dot(state)
     })
 
+    // Render the Jade template.
     it('Jade', function () {
-      templates.Jade(state)
+      jade(state)
     })
 
-    /*
-    it('F', function () {
-      templates.F(state)
+    // Render the Marko template.
+    it('Marko', function () {
+      marko.renderSync(state)
     })
-
-    it('G', function () {
-      templates.G(state)
-    })
-    */
 
   })
 

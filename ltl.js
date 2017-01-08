@@ -7,9 +7,6 @@ var ltl = this.ltl = this.ltl || {
   // The scope is a window or process.
   scope: this,
 
-  // Allow users to see what version of Ltl they're using.
-  version: '0.3.1',
-
   // Some HTML tags won't have end tags.
   selfClosePattern: /^(!DOCTYPE|area|base|br|hr|img|input|link|meta|-|\/\/|space|js|css)(\b|$)/,
 
@@ -19,12 +16,9 @@ var ltl = this.ltl = this.ltl || {
   // Pattern for assignment.
   assignmentPattern: /^([$A-Za-z_][$A-Za-z_0-9\.\[\]'"]*\s*=[^\{])/,
 
-  // Supported command keywords.
-  commandPattern: /^(call|get|set)\b/,
-
   // JavaScript tokens that don't need the scope "scope" prepended for interpolation.
   // TODO: Flesh out this list?
-  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|new|this|typeof|instanceof|Math|Object|Array|Date|Error|RegExp|JSON|Jymin|scope|state|setTimeout|clearTimeout)$/,
+  jsPattern: /^(undefined|true|false|null|function|NaN|Infinity|window|location|document|console|new|this|typeof|instanceof|Math|Object|Array|Date|Error|RegExp|JSON|Jymin|scope|state|cache|output|setTimeout|clearTimeout)$/,
 
   // Register several languages and their targets.
   languages: {
@@ -81,34 +75,28 @@ var ltl = this.ltl = this.ltl || {
 
   // In browsers and istanbul, run JS with `eval`, otherwise run with `vm`.
   run: (
-    (typeof require === 'function') ?
-    require('./common/vm/run') :
-    function (src, name) {
-      var f
-      try {
-        eval('f=' + src); // jshint ignore:line
-      } catch (e) {
-        e.message = '[Ltl] ' + e.message
-        if (name) {
-          e.message += '\nTemplate: ' + name
+    typeof require === 'function'
+      ? require('lighter-vm').run
+      : function (src, name) {
+        var f
+        try {
+          /* eslint-disable */
+          eval('f=' + src)
+          /* eslint-enable */
+        } catch (e) {
+          e.message = '[Ltl] ' + e.message
+          if (name) {
+            e.message += '\nTemplate: ' + name
+          }
+          e.message += '\nFunction: ' + src
+          throw e.stack && e
         }
-        e.message += '\nFunction: ' + src
-        throw e.stack && e
+        return f
       }
-      return f
-    }
   ),
 
   // Store templates that have been compiled.
-  // Include 2 built-ins for interpolation.
-  cache: {
-    '$': function (v) {
-      return (!v && v !== 0 ? '' : (typeof v === 'object' ? JSON.stringify(v) || '' : '' + v)).replace(/</g, '&lt;')
-    },
-    '&': function (v) {
-      return encodeURIComponent(!v && v !== 0 ? '' : '' + v)
-    }
-  },
+  cache: new Cache(),
 
   // Store filter modules, such as "coffee-script" and "marked".
   filters: {
@@ -118,7 +106,7 @@ var ltl = this.ltl = this.ltl || {
 
   // Default compile settings.
   options: {
-    tabWidth: 4,
+    tabWidth: 2,
     defaultTag: 'div'
   },
 
@@ -129,12 +117,12 @@ var ltl = this.ltl = this.ltl || {
 
   // Create a function that accepts scope and returns markup.
   compile: function (code, options) {
-
     // Copy the default options.
     var settings = {
       tabWidth: this.options.tabWidth,
       defaultTag: this.options.defaultTag,
-      space: this.options.space
+      space: this.options.space,
+      cache: this.cache
     }
     for (var name in options) {
       settings[name] = options[name]
@@ -147,7 +135,7 @@ var ltl = this.ltl = this.ltl || {
     // Replace carriage returns for Windows compatibility.
     code = code.replace(/\r/g, '')
 
-    // Be lenient with mixed tabs and spaces, assuming tab width of 4.
+    // Be lenient with mixed tabs and spaces.
     var tabReplacement = Array(settings.tabWidth + 1).join(' ')
     code = code.replace(/\t/g, tabReplacement)
 
@@ -166,9 +154,7 @@ var ltl = this.ltl = this.ltl || {
     var stack = []
     var mode = 'html'
     var previousTag
-    var hasHtmlTag = false
     var hasHtmlOutput = false
-    var hasAssignments = false
     var hasContent = false
     var useCache = false
     var tagDepth = 0
@@ -195,10 +181,6 @@ var ltl = this.ltl = this.ltl || {
     var properties = {}
     var blockProperty
     var blockTarget
-    var eventLanguage
-
-    // Allow event listeners to be added.
-    var bindings = {}
 
     function appendText (textMode, text) {
       if (textMode !== mode) {
@@ -424,7 +406,7 @@ var ltl = this.ltl = this.ltl || {
         var token = tokens[i]
         var stringTokens = token.match(/['"]/g)
         if (stringTokens) {
-          isInString = ((isInString ? 1 : 0 ) + stringTokens.length) % 2
+          isInString = ((isInString ? 1 : 0) + stringTokens.length) % 2
         } else if (!isInString) {
           if (/^[a-z_]/i.test(token)) {
             if (!ltl.jsPattern.test(token)) {
@@ -545,7 +527,6 @@ var ltl = this.ltl = this.ltl || {
 
       // Assignment patterns just need to be stateified.
       } else if (ltl.assignmentPattern.test(line)) {
-        hasAssignments = true
         line = scopify(line) + ';'
         appendText('script', line)
 
@@ -573,7 +554,6 @@ var ltl = this.ltl = this.ltl || {
         while (rest && (++t < maxT)) {
           var tag = ''
           var id = ''
-          var autoClass = ''
           var classes = []
           var attributes = ''
           var character = ''
@@ -598,14 +578,12 @@ var ltl = this.ltl = this.ltl || {
 
             // If it's the beginning of a list of attributes, iterate through them.
             } else if (character === '(' || character === '[') {
-
               // Move on from the parentheses.
               rest = rest.substring(1)
 
               // Build attributes.
               attributes = ''
               while (rest && (++t < maxT)) {
-
                 // Find quoted attributes or the end of the list.
                 end = rest.search(/[\)\]"']/)
 
@@ -736,7 +714,6 @@ var ltl = this.ltl = this.ltl || {
             html = ltl.escapeSingleQuotes(html)
             if (tag === 'html') {
               // If there's an HTML tag, don't wrap with a scope.
-              hasHtmlTag = true
               if (!/DOCTYPE/.test(output)) {
                 html = '<!DOCTYPE html>' + (settings.space ? '\\n' : '') + html
               }
@@ -759,7 +736,6 @@ var ltl = this.ltl = this.ltl || {
           }
 
           if (tag) {
-
             // Make sure we can close this tag.
             if (stack[indent]) {
               stack[indent] += ',' + tag
@@ -795,21 +771,21 @@ var ltl = this.ltl = this.ltl || {
 
     // Create the function.
     if (escapeCommentVar) {
-      output = (settings.name ?
-        'var ' + escapeCommentVar + "=cache['-'];" + newLine :
-        ltl.cache['-'].toString().replace(/\(/, escapeCommentVar + '(') + ';' + newLine) + output
+      output = (settings.name
+        ? 'var ' + escapeCommentVar + "=cache['-'];" + newLine
+        : ltl.cache['-'].toString().replace(/\(/, escapeCommentVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (escapeHtmlVar) {
-      output = (settings.name ?
-        'var ' + escapeHtmlVar + "=cache.$;" + newLine :
-        ltl.cache.$.toString().replace(/\(/, escapeHtmlVar + '(') + ';' + newLine) + output
+      output = (settings.name
+        ? 'var ' + escapeHtmlVar + '=cache.$;' + newLine
+        : ltl.cache.$.toString().replace(/\(/, escapeHtmlVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (encodeUriVar) {
-      output = (settings.name ?
-        'var ' + encodeUriVar + "=cache['&'];" + newLine :
-        ltl.cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';' + newLine) + output
+      output = (settings.name
+        ? 'var ' + encodeUriVar + "=cache['&'];" + newLine
+        : ltl.cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (useCache) {
@@ -852,6 +828,18 @@ var ltl = this.ltl = this.ltl || {
     }
 
     return template
+  }
+}
+
+/**
+ * Return a new cache for ltl templates.
+ */
+function Cache () {
+  this['$'] = function (v) {
+      return (!v && v !== 0 ? '' : (typeof v === 'object' ? JSON.stringify(v) || '' : '' + v)).replace(/</g, '&lt;')
+  }
+  this['&'] = function (v) {
+    return encodeURIComponent(!v && v !== 0 ? '' : '' + v)
   }
 }
 

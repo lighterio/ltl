@@ -13,14 +13,6 @@ describe('API', function () {
     })
   })
 
-  describe('ltl.version', function () {
-    it('exposes the module version', function () {
-      is.in(ltl.version, /^[0-9]+\.[0-9]+\.[0-9]+$/)
-      var pkg = require('../package.json')
-      is(pkg.version, ltl.version)
-    })
-  })
-
   describe('ltl.setOption("space", string)', function () {
     it('modifies the space variable', function () {
       ltl.setOption('space', '\t')
