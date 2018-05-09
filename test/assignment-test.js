@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Assigment', function () {
-
   it('sets keys in a state', function () {
     var template = ltl.compile('x = 1\np ={x}')
     var result = template({})
@@ -26,12 +27,9 @@ describe('Assigment', function () {
     is(result, '<p>x</p>')
   })
 
-  /*
-  it('works with empty states', function () {
+  it.skip('works with empty states', function () {
     var template = ltl.compile('x = 1\np ={x}')
     var result = template()
     is(result, '<p>1</p>')
   })
-  */
-
 })

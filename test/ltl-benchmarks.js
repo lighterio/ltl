@@ -8,13 +8,10 @@ var bench = global.bench || function () {}
 var testMarko = 1
 
 describe('Message and 10-item list', function () {
-
   var templates = {}
 
   bench('compiling', function () {
-
     this.timeout(1e4)
-
     it('Ltl', function () {
       templates.Ltl = ltl.compile(
         'html\n' +
@@ -54,11 +51,9 @@ describe('Message and 10-item list', function () {
         '   each item in items\n' +
         '    li #{item}')
     })
-
   })
 
   bench('rendering', function () {
-
     var state = {
       message: 'hello',
       items: ['apples', 'apricots', 'bananas', 'cherries', 'grapes', 'kiwis', 'mangoes', 'oranges', 'pears', 'plums']
@@ -95,7 +90,5 @@ describe('Message and 10-item list', function () {
     it('Marko', function () {
       marko.renderSync(state)
     })
-
   })
-
 })

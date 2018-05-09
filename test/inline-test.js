@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Inline JS', function () {
-
   it('works with a js tag', function () {
     var template = ltl.compile('js\n scope.a = 1;\n: ${a}')
     var result = template({})
@@ -13,11 +14,9 @@ describe('Inline JS', function () {
     var result = template({})
     is(result, '1')
   })
-
 })
 
 describe('Inline CSS', function () {
-
   it('works with a css tag', function () {
     var template = ltl.compile('css\n p{color:black}')
     var result = template()
@@ -30,5 +29,4 @@ describe('Inline CSS', function () {
     is.in(result, 'black')
     is.notIn(result, 'base')
   })
-
 })

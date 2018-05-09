@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Ltl comments', function () {
-
   it('are omitted', function () {
     var result = ltl.compile('// Comment')()
     is(result, '')
@@ -28,11 +29,9 @@ describe('Ltl comments', function () {
     var result = ltl.compile('h1 Comments\n// Hidden\np http://lighter.io/ltl\n //\n  block\n  hide')()
     is(result, '<h1>Comments</h1><p>http://lighter.io/ltl</p>')
   })
-
 })
 
 describe('HTML comments', function () {
-
   it('work on a single line', function () {
     var result = ltl.compile('- Comment')()
     is(result, '<!--Comment-->')
@@ -42,5 +41,4 @@ describe('HTML comments', function () {
     var result = ltl.compile('-\n p Hide')()
     is(result, '<!--<p>Hide</p>-->')
   })
-
 })

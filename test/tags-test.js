@@ -1,9 +1,9 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Tags', function () {
-
   describe('<div> assumption', function () {
-
     it('assumes <div> when using an ID with no tag', function () {
       var result = ltl.compile('#a')()
       is(result, '<div id="a"></div>')
@@ -46,7 +46,6 @@ describe('Tags', function () {
   })
 
   describe('IDs and classes', function () {
-
     it('work with a tag and ID', function () {
       var result = ltl.compile('a#a')()
       is(result, '<a id="a"></a>')
@@ -66,11 +65,9 @@ describe('Tags', function () {
       var result = ltl.compile('i.icon#save')()
       is(result, '<i id="save" class="icon"></i>')
     })
-
   })
 
   describe('attributes', function () {
-
     it('end automagically when they\'re unclosed', function () {
       var result = ltl.compile('(blah')()
       is(result, '<div blah></div>')
@@ -120,7 +117,5 @@ describe('Tags', function () {
       var result = ltl.compile('p(id="p")stuff blah')()
       is(result, '<p id="p">blah</p>')
     })
-
   })
-
 })

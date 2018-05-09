@@ -1,7 +1,6 @@
 var ltl = require('../ltl')
 
 describe('Interpolation', function () {
-
   it('does not stateify Math', function () {
     var template = ltl.compile('for n in list\n . sqrt(={n}): ={Math.sqrt(n).toFixed(4)}')
     var result = template({list:[1, 2, 3]})
@@ -34,5 +33,4 @@ describe('Interpolation', function () {
     var result = ltl.compile('code:\n \\${a}\n \\={b}')()
     is(result, '<code>${a}\n={b}</code>')
   })
-
 })

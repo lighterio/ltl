@@ -1,7 +1,8 @@
+'use strict'
+/* global describe it is */
 var ltl = require('../ltl')
 
 describe('Magic', function () {
-
   it('auto-inserts <!DOCTYPE html>', function () {
     var result = ltl.compile('html\n head\n  title Title\n body Body')()
     is(result, '<!DOCTYPE html><html><head><title>Title</title></head><body>Body</body></html>')
@@ -32,5 +33,4 @@ describe('Magic', function () {
     var result = ltl.compile('p\n :\n  hi')()
     is(result, '<p>hi</p>')
   })
-
 })
