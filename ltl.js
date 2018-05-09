@@ -14,7 +14,7 @@ var ltl = this.ltl = this.ltl || {
   controlPattern: /^(for|if|else|break|continue)\b/,
 
   // Pattern for assignment.
-  assignmentPattern: /^([$A-Za-z_][$A-Za-z_0-9\.\[\]'"]*\s*=[^\{])/,
+  assignmentPattern: /^([$A-Za-z_][$A-Za-z_0-9.[\]'"]*\s*=[^{])/,
 
   // JavaScript tokens that don't need the scope "scope" prepended for interpolation.
   // TODO: Flesh out this list?
@@ -96,6 +96,7 @@ var ltl = this.ltl = this.ltl || {
   ),
 
   // Store templates that have been compiled.
+  Cache: Cache,
   cache: new Cache(),
 
   // Store filter modules, such as "coffee-script" and "marked".
@@ -117,26 +118,21 @@ var ltl = this.ltl = this.ltl || {
 
   // Create a function that accepts scope and returns markup.
   compile: function (code, options) {
-    // Copy the default options.
-    var settings = {
-      tabWidth: this.options.tabWidth,
-      defaultTag: this.options.defaultTag,
-      space: this.options.space,
-      cache: this.cache
-    }
-    for (var name in options) {
-      settings[name] = options[name]
-    }
-
-    if (settings.space) {
-      settings.space = ltl.escapeBlock(settings.space)
+    options = options || 0
+    var defaults = this.options
+    var tabWidth = options.tabWidth || defaults.tabWidth
+    var space = options.space || defaults.space
+    var defaultTag = options.defaultTag || defaults.defaultTag
+    var cache = options.cache || ltl.cache
+    if (space) {
+      space = ltl.escapeBlock(space)
     }
 
     // Replace carriage returns for Windows compatibility.
     code = code.replace(/\r/g, '')
 
     // Be lenient with mixed tabs and spaces.
-    var tabReplacement = Array(settings.tabWidth + 1).join(' ')
+    var tabReplacement = Array(tabWidth + 1).join(' ')
     code = code.replace(/\t/g, tabReplacement)
 
     // We'll auto-detect tab width.
@@ -147,7 +143,7 @@ var ltl = this.ltl = this.ltl || {
     var lineIndex
     var lineCount = lines.length
 
-    var newLine = settings.space ? '\n' : ''
+    var newLine = space ? '\n' : ''
 
     var globalSpaces = 0
     var indent = 0
@@ -215,8 +211,8 @@ var ltl = this.ltl = this.ltl || {
 
       // Some options should be passed through.
       var blockOptions = {
-        space: settings.space,
-        enableDebug: settings.enableDebug
+        space: space,
+        enableDebug: options.enableDebug
       }
 
       // If we're in a "call" block, call another template with compiled parts.
@@ -274,13 +270,13 @@ var ltl = this.ltl = this.ltl || {
       }
 
       text = ltl.trim(text)
-      if (settings.space) {
+      if (space) {
         if (hasHtmlOutput) {
           text = '\n' + text
         }
-        text = text.replace(/\n/g, '\n' + ltl.repeat(settings.space, tagDepth))
+        text = text.replace(/\n/g, '\n' + ltl.repeat(space, tagDepth))
         if (blockTag) {
-          text += '\n' + ltl.repeat(settings.space, tagDepth - 1)
+          text += '\n' + ltl.repeat(space, tagDepth - 1)
         }
       }
 
@@ -323,8 +319,8 @@ var ltl = this.ltl = this.ltl || {
               tagDepth--
               if (tag === previousTag) {
                 previousTag = null
-              } else if (settings.space) {
-                html = '\\n' + ltl.repeat(settings.space, tagDepth) + html
+              } else if (space) {
+                html = '\\n' + ltl.repeat(space, tagDepth) + html
               }
               appendText('html', html)
             }
@@ -678,7 +674,7 @@ var ltl = this.ltl = this.ltl || {
             if (!tag) {
               var useDefault = (blockTag === null) || id || className || attributes
               if (useDefault) {
-                tag = blockTag = settings.defaultTag
+                tag = blockTag = defaultTag
               }
             }
 
@@ -715,13 +711,13 @@ var ltl = this.ltl = this.ltl || {
             if (tag === 'html') {
               // If there's an HTML tag, don't wrap with a scope.
               if (!/DOCTYPE/.test(output)) {
-                html = '<!DOCTYPE html>' + (settings.space ? '\\n' : '') + html
+                html = '<!DOCTYPE html>' + (space ? '\\n' : '') + html
               }
             }
 
-            // Prepend whitespace if requested via settings.space.
-            if (settings.space) {
-              html = ltl.repeat(settings.space, tagDepth) + html
+            // Prepend whitespace if requested via space.
+            if (space) {
+              html = ltl.repeat(space, tagDepth) + html
               // Prepend a line break if this isn't the first tag.
               if (hasHtmlOutput) {
                 html = '\\n' + html
@@ -743,7 +739,7 @@ var ltl = this.ltl = this.ltl || {
               stack[indent] = tag
             }
 
-            // Allow same-line tag open/close in settings.space mode.
+            // Allow same-line tag open/close in space mode.
             previousTag = tag
             if (!ltl.selfClosePattern.test(tag)) {
               tagDepth++
@@ -771,21 +767,21 @@ var ltl = this.ltl = this.ltl || {
 
     // Create the function.
     if (escapeCommentVar) {
-      output = (settings.name
+      output = (options.name
         ? 'var ' + escapeCommentVar + "=cache['-'];" + newLine
-        : ltl.cache['-'].toString().replace(/\(/, escapeCommentVar + '(') + ';' + newLine) + output
+        : cache['-'].toString().replace(/\(/, escapeCommentVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (escapeHtmlVar) {
-      output = (settings.name
+      output = (options.name
         ? 'var ' + escapeHtmlVar + '=cache.$;' + newLine
-        : ltl.cache.$.toString().replace(/\(/, escapeHtmlVar + '(') + ';' + newLine) + output
+        : cache.$.toString().replace(/\(/, escapeHtmlVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (encodeUriVar) {
-      output = (settings.name
+      output = (options.name
         ? 'var ' + encodeUriVar + "=cache['&'];" + newLine
-        : ltl.cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';' + newLine) + output
+        : cache['&'].toString().replace(/\(/, encodeUriVar + '(') + ';' + newLine) + output
       useCache = true
     }
     if (useCache) {
@@ -805,7 +801,7 @@ var ltl = this.ltl = this.ltl || {
     }
 
     // Evaluate the template as a function.
-    name = settings.name
+    var name = options.name
     var template
     try {
       template = ltl.run(output, name)
@@ -817,9 +813,9 @@ var ltl = this.ltl = this.ltl || {
 
     // If there's a name specified, cache it and refer to it.
     if (name) {
-      ltl.cache[name] = template
+      cache[name] = template
       template.key = name
-      template.cache = ltl.cache
+      template.cache = cache
     }
 
     // Add any discovered properties to the template.
@@ -835,12 +831,12 @@ var ltl = this.ltl = this.ltl || {
  * Return a new cache for ltl templates.
  */
 function Cache () {
-  this['$'] = function (v) {
-      return (!v && v !== 0 ? '' : (typeof v === 'object' ? JSON.stringify(v) || '' : '' + v)).replace(/</g, '&lt;')
-  }
-  this['&'] = function (v) {
-    return encodeURIComponent(!v && v !== 0 ? '' : '' + v)
-  }
+}
+Cache.prototype['$'] = function (v) {
+  return (!v && v !== 0 ? '' : (typeof v === 'object' ? JSON.stringify(v) || '' : '' + v)).replace(/</g, '&lt;')
+}
+Cache.prototype['&'] = function (v) {
+  return encodeURIComponent(!v && v !== 0 ? '' : '' + v)
 }
 
 // Export Ltl as a CommonJS module.

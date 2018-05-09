@@ -1,6 +1,6 @@
 {
   "name": "ltl",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Lean Template Language for JavaScript and HTML.",
   "dependencies": {
     "lighter-vm": "1.0.0"
@@ -8,7 +8,7 @@
   "devDependencies": {
     "coffee-script": "1.9.0",
     "dot": "1.1.1",
-    "exam": "^1.4.5",
+    "exam": "2.1.1",
     "jade": "1.11.0",
     "jsx": "0.9.89",
     "less": "2.4.0",
@@ -31,11 +31,10 @@
     "node": ">=0.8.28"
   },
   "scripts": {
-    "test": "./node_modules/exam/exam.js",
-    "cover": "./node_modules/exam/exam-cover.js",
+    "test": "exam",
+    "cover": "exam-cover",
     "report": "open coverage/lcov-report/index.html",
-    "bench": "./node_modules/exam/exam.js test/bench",
-    "perf": "node perf"
+    "perf": "exam --bench test/ltl-benchmarks.js"
   },
   "repository": "https://github.com/lighterio/ltl.git",
   "bugs": "https://github.com/lighterio/ltl/issues",
@@ -45,5 +44,5 @@
     "Sam Eubank <sameubank@gmail.com>",
     "Kaushik Shankar <skaushik92@gmail.com>"
   ],
-  "license": "ISC"
+  "license": "MIT"
 }
